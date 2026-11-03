@@ -20,14 +20,9 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# CSS HANYA UNTUK TAMPILAN PREVIEW DI LAYAR STREAMLIT
 st.markdown("""
     <style>
-    .preview-box { 
-        max-width: 800px; margin: auto; padding: 25px; border: 1px solid #eee; 
-        box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 14px; line-height: 22px; 
-        font-family: Arial, sans-serif; color: #000; background-color: #fff; 
-    }
+    .preview-box { max-width: 800px; margin: auto; padding: 25px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 14px; line-height: 22px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
     .header-title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 0px; }
     .sub-title { text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 8px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
@@ -54,11 +49,8 @@ with col_input:
     default_club_name = "Nama Club..."
     if uploaded_file is not None:
         try:
-            # Membaca file tanpa header langsung agar bisa mencari posisi judul tabel
             df_raw = pd.read_excel(uploaded_file, header=None)
-            
             header_row_idx = -1
-            # Mencari baris yang mengandung kata NAMA (maks 20 baris pertama)
             for i in range(min(20, len(df_raw))):
                 if df_raw.iloc[i].astype(str).str.upper().str.contains('NAMA').any():
                     header_row_idx = i
@@ -68,7 +60,6 @@ with col_input:
                 df_raw.columns = df_raw.iloc[header_row_idx]
                 df = df_raw.iloc[header_row_idx + 1:].reset_index(drop=True)
                 col_nama = [col for col in df_raw.columns if 'NAMA' in str(col).upper()]
-                
                 valid_rows = df[df[col_nama[0]].notna()]
                 valid_rows = valid_rows[~valid_rows[col_nama[0]].astype(str).str.contains("JUMLAH|NAMA", case=False)]
                 jml_peserta = len(valid_rows)
@@ -86,9 +77,13 @@ with col_input:
     nama_club = st.text_input("Nama Club Renang", default_club_name)
     nama_pj = st.text_input("Nama Penanggung Jawab", "Bpk/Ibu ...")
     no_kontak = st.text_input("Nomor Kontak", "-")
+    
+    # INPUT BARU DITAMBAHKAN DI SINI
+    keterangan_tabel = st.text_input("Keterangan di Tabel", "Pembayaran bulanan club renang")
     periode = st.text_input("Periode Latihan", "Oktober 2026")
     total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
     metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"], horizontal=True)
+    referensi = st.text_input("Keterangan / Ref. Pembayaran", "-")
     petugas = st.text_input("Penerima/Petugas", "Admin KCW")
 
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
@@ -109,7 +104,6 @@ else:
     teks_penutup = "Mohon segera melakukan pelunasan tagihan di atas. Terima kasih telah mempercayakan latihan Anda di Kaumpandak City Waterpark."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
 
-# ISI HTML INVOICE
 isi_invoice = f"""
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
 <div class="sub-title">{judul_dokumen}</div>
@@ -127,11 +121,11 @@ isi_invoice = f"""
 <strong>RINCIAN PEMBAYARAN:</strong>
 <table>
 <tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr>
-<tr><td style="text-align: center;">1</td><td>Pembayaran bulanan club renang</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr>
+<tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr>
 </table>
 <table class="no-border">
 <tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp; {cb_qris} QRIS</td></tr>
-<tr><td>Keterangan / Referensi</td><td>:</td><td>-</td></tr>
+<tr><td>Keterangan / Referensi</td><td>:</td><td>{referensi}</td></tr>
 <tr><td><strong>TOTAL TAGIHAN</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr>
 <tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr>
 </table>
@@ -143,13 +137,11 @@ isi_invoice = f"""
 <div class="footer-note">{teks_footer}</div>
 """
 
-# Bersihkan karakter baris baru (enter) agar string aman dijalankan oleh Javascript
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '')
 
 with col_preview:
     st.header("📄 3. Preview & Cetak")
     
-    # TOMBOL PRINT MEMBUKA JENDELA BARU BERISI INVOICE BERSIH
     js_print_code = f"""
     <button onclick="printInvoice()" style="
         background-color: #008CBA; border: none; color: white; padding: 12px 24px;
@@ -184,6 +176,4 @@ with col_preview:
     """
     
     components.html(js_print_code, height=70)
-    
-    # Render preview invoice di Web
     st.markdown(f'<div class="preview-box">{isi_invoice}</div>', unsafe_allow_html=True)
