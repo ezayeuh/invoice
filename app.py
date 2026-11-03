@@ -42,7 +42,6 @@ st.markdown("""
 
 col_input, col_preview = st.columns([1, 2])
 
-# Inisialisasi variabel perhitungan
 jml_peserta = 0
 total_bayar = 0
 
@@ -51,30 +50,27 @@ with col_input:
     uploaded_file = st.file_uploader("Upload File Rekap Excel (.xlsx / .xls)", type=["xlsx", "xls"])
     
     st.header("📝 2. Pengaturan Invoice")
+    
+    # PILIHAN STATUS PEMBAYARAN
+    status_pembayaran = st.radio("Status Dokumen", ["LUNAS", "BELUM LUNAS"], horizontal=True)
+    
     tarif_per_orang = st.number_input("Tarif per Kehadiran (Rp)", value=20000, step=5000)
     
-    # PROSES EXCEL OTOMATIS
     default_club_name = "Nama Club..."
     if uploaded_file is not None:
         try:
             df = pd.read_excel(uploaded_file)
-            
-            # Asumsi perhitungan: menghitung baris yang ada nama siswanya (mengabaikan baris kosong atau footer 'JUMLAH')
-            # Mencari kolom yang mengandung kata 'NAMA'
             col_nama = [col for col in df.columns if 'NAMA' in str(col).upper()]
             if col_nama:
                 valid_rows = df[df[col_nama[0]].notna()]
-                # Singkirkan baris rekapitulasi bawah jika ada kata "JUMLAH"
                 valid_rows = valid_rows[~valid_rows[col_nama[0]].astype(str).str.contains("JUMLAH", case=False)]
                 jml_peserta = len(valid_rows)
             else:
-                # Jika tidak ada kolom nama, kurangi 1 baris untuk footer jumlah
                 jml_peserta = max(0, len(df) - 1)
                 
             total_bayar = jml_peserta * tarif_per_orang
             st.success(f"✅ Data Terbaca! Total Peserta: **{jml_peserta} orang** | Total Tagihan: **{format_rupiah(total_bayar)}**")
             
-            # Ambil nama club dari nama file
             default_club_name = uploaded_file.name.replace(".xlsx", "").replace(".xls", "").replace("REKAP KEHADIRAN", "").replace("LAPORAN KEHADIRAN", "").replace("OKTOBER 2026", "").strip().upper()
             
         except Exception as e:
@@ -82,26 +78,37 @@ with col_input:
     else:
         st.info("Silakan upload file Excel untuk menghitung otomatis.")
 
-    # Form lanjutan
     no_invoice = st.text_input("No. Invoice", f"INV/KCW/{datetime.today().year}/{datetime.today().month:02d}-XXX")
-    tgl_bayar = st.date_input("Tanggal Pembayaran", datetime.today())
+    tgl_bayar = st.date_input("Tanggal Dokumen", datetime.today())
     nama_club = st.text_input("Nama Club Renang", default_club_name)
     nama_pj = st.text_input("Nama Penanggung Jawab", "Bpk/Ibu ...")
     no_kontak = st.text_input("Nomor Kontak", "-")
     periode = st.text_input("Periode Latihan", "Oktober 2026")
     
-    # Allow manual override for totals if needed
     total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
     
     metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"])
     petugas = st.text_input("Nama Penerima/Petugas", "Admin KCW")
 
-# Konversi angka ke huruf
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
 
 cb_tunai = "☑" if metode == "Tunai" else "☐"
 cb_transfer = "☑" if metode == "Transfer" else "☐"
 cb_qris = "☑" if metode == "QRIS" else "☐"
+
+# --- LOGIKA DINAMIS BERDASARKAN STATUS ---
+if status_pembayaran == "LUNAS":
+    judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE PEMBAYARAN DITERIMA |"
+    label_status = "<strong>LUNAS ✓</strong>"
+    label_tanggal = "TANGGAL PEMBAYARAN"
+    teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
+    teks_footer = "Dokumen ini merupakan bukti pembayaran yang sah setelah pembayaran diterima oleh pihak Kaumpandak City Waterpark."
+else:
+    judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
+    label_status = "<strong>BELUM LUNAS ⏳</strong>"
+    label_tanggal = "TANGGAL INVOICE"
+    teks_penutup = "Mohon segera melakukan pelunasan tagihan di atas. Terima kasih telah mempercayakan latihan Anda di Kaumpandak City Waterpark."
+    teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
 
 with col_preview:
     st.header("📄 3. Preview & Cetak")
@@ -112,11 +119,11 @@ with col_preview:
     
     html_content = f"""<div class="invoice-box">
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
-<div class="sub-title">BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE PEMBAYARAN DITERIMA |</div>
+<div class="sub-title">{judul_dokumen}</div>
 <table class="no-border" style="margin-bottom: 20px;">
 <tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr>
-<tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td><strong>LUNAS ✓</strong></td></tr>
-<tr><td><strong>TANGGAL PEMBAYARAN</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr>
+<tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr>
+<tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr>
 </table>
 <strong>DITERIMA DARI:</strong>
 <table class="no-border" style="margin-bottom: 20px;">
@@ -132,15 +139,15 @@ with col_preview:
 <table class="no-border">
 <tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp;&nbsp; {cb_qris} QRIS</td></tr>
 <tr><td>Keterangan / Referensi</td><td>:</td><td>-</td></tr>
-<tr><td><strong>TOTAL DIBAYARKAN</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr>
+<tr><td><strong>TOTAL TAGIHAN</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr>
 <tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr>
 </table>
-<p style="margin-top:20px;">Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda.</p>
+<p style="margin-top:20px;">{teks_penutup}</p>
 <div class="signature-box">
 <div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div>
 <div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div>
 </div>
-<div class="footer-note">Dokumen ini merupakan bukti pembayaran yang sah setelah pembayaran diterima oleh pihak Kaumpandak City Waterpark.</div>
+<div class="footer-note">{teks_footer}</div>
 </div>"""
 
     st.markdown(html_content, unsafe_allow_html=True)
