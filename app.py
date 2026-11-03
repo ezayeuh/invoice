@@ -84,13 +84,6 @@ with col_input:
     total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
     metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"], horizontal=True)
     referensi = st.text_input("Keterangan / Ref. Pembayaran", "-")
-    
-    st.subheader("💳 Info Rekening & QRIS")
-    bank_nama = st.text_input("Nama Bank", "BCA")
-    no_rekening = st.text_input("Nomor Rekening", "1234567890")
-    rekening_a_n = st.text_input("Atas Nama Rekening", "Kaumpandak City Waterpark")
-    qris_image_url = st.text_input("Link / URL Gambar QRIS (Opsional)", "")
-    
     petugas = st.text_input("Penerima/Petugas", "Admin KCW")
 
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
@@ -111,13 +104,15 @@ else:
     teks_penutup = "Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini. Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
 
-# Blok Informasi Tambahan Rekening / QRIS untuk ditampilkan di dalam Invoice
+# Konversi link Google Drive Anda menjadi Direct Image Link otomatis
+qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
+
 info_pembayaran_html = f"""
 <div class="payment-info">
     <strong>INFORMASI PEMBAYARAN:</strong><br>
-    • <b>Transfer Bank:</b> Bank {bank_nama} No. Rek: <b>{no_rekening}</b> a.n. {rekening_a_n}<br>
-    • <b>QRIS:</b> Silakan scan QR Code resmi Kaumpandak City Waterpark di bawah ini:<br>
-    {"<div style='text-align: center; margin-top: 8px;'><img src='" + qris_image_url + "' width='120'></div>" if qris_image_url else "<em style='color: #666;'>[ Lampiran QR Code QRIS ]</em>"}
+    • <b>Transfer Bank:</b> Bank BCA No. Rek: <b>1234567890</b> a.n. Kaumpandak City Waterpark<br>
+    • <b>QRIS:</b> Silakan scan QR Code resmi di bawah ini:<br>
+    <div style='text-align: center; margin-top: 8px;'><img src='{qris_direct_url}' width='120'></div>
 </div>
 """
 
