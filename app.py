@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Auto Invoice Club Renang", layout="wide")
 
@@ -19,10 +20,10 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS SUPAYA PAS 1 HALAMAN A4 & BERSIH ---
+# --- CSS TAMPILAN & PRINT 1 HALAMAN PAS ---
 st.markdown("""
     <style>
-    .preview-box { max-width: 800px; margin: auto; padding: 15px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 13px; line-height: 18px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
+    .preview-box { max-width: 800px; margin: auto; padding: 18px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 13px; line-height: 18px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
     .header-title { text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0px; }
     .sub-title { text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 13px; }
@@ -134,7 +135,7 @@ else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
     label_status = "<strong>BELUM LUNAS ⏳</strong>"
     label_tanggal = "TANGGAL INVOICE"
-    teks_penutup = "Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini. Terima kasih."
+    teks_penutup = "Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di atas. Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
     
     metode_pembayaran_html = f"""
@@ -143,16 +144,30 @@ else:
     <tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr>
     </table>
     """
-    info_pembayaran_html = f"""<div class="payment-info"><div style="font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">INFORMASI PEMBAYARAN:</div><div class="payment-container"><div class="payment-left"><b>Transfer Bank:</b><br>• Bank BCA | No. Rek: <b>1234567890</b><br>• a.n. Kaumpandak City Waterpark</div><div class="payment-right"><b>QRIS:</b><br><img src='{qris_direct_url}' width='45' style='margin-top: 2px;'><br><span style='font-size: 8px; color: #555;'>Scan untuk Bayar</span></div></div></div>"""
+    # Informasi pembayaran berada di atas, kalimat penutup di bawah kotak info pembayaran
+    info_pembayaran_html = f"""
+    <div class="payment-info">
+        <div style="font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">INFORMASI PEMBAYARAN:</div>
+        <div class="payment-container">
+            <div class="payment-left"><b>Transfer Bank:</b><br>• Bank BCA | No. Rek: <b>1234567890</b><br>• a.n. Kaumpandak City Waterpark</div>
+            <div class="payment-right"><b>QRIS:</b><br><img src='{qris_direct_url}' width='45' style='margin-top: 2px;'><br><span style='font-size: 8px; color: #555;'>Scan untuk Bayar</span></div>
+        </div>
+    </div>
+    <p style="margin-top:6px; margin-bottom: 6px;">{teks_penutup}</p>
+    """
 
-isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr></table><strong>DITERIMA DARI:</strong><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><strong>RINCIAN PEMBAYARAN:</strong><table><tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}<p style="margin-top:4px; margin-bottom: 4px;">{teks_penutup}</p><div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
+# Jika LUNAS, teks_penutup langsung tampil di sini
+penutup_lunas_html = f"""<p style="margin-top:6px; margin-bottom: 6px;">{teks_penutup}</p>""" if status_pembayaran == "LUNAS" else ""
+
+isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr></table><strong>DITERIMA DARI:</strong><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><strong>RINCIAN PEMBAYARAN:</strong><table><tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_lunas_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
 
 with col_preview:
     st.header("📄 3. Preview & Cetak")
     
-    # Tombol cetak menggunakan JavaScript langsung pada halaman aktif (tanpa komponen tersembunyi ganda)
-    st.markdown("""
-        <button onclick="window.print()" style="
+    # Tombol cetak menggunakan komponen HTML agar fungsi klik print berfungsi normal
+    components.html(
+        """
+        <button onclick="window.parent.print()" style="
             background-color: #008CBA; border: none; color: white; padding: 12px 24px;
             text-align: center; text-decoration: none; display: block; font-size: 16px;
             font-weight: bold; margin: 0px 0px 15px 0px; cursor: pointer; border-radius: 6px;
@@ -160,6 +175,8 @@ with col_preview:
         ">
             🖨️ CETAK INVOICE SEKARANG (PRINT)
         </button>
-    """, unsafe_allow_html=True)
+        """,
+        height=60
+    )
     
     st.markdown(isi_invoice, unsafe_allow_html=True)
