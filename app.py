@@ -20,62 +20,21 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS PRINT AGRESIF ---
+# CSS HANYA UNTUK TAMPILAN PREVIEW DI LAYAR STREAMLIT (TIDAK DIPAKAI SAAT PRINT)
 st.markdown("""
     <style>
-    .invoice-box { 
+    .preview-box { 
         max-width: 800px; margin: auto; padding: 25px; border: 1px solid #eee; 
-        box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 15px; line-height: 22px; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 14px; line-height: 22px; 
         font-family: Arial, sans-serif; color: #000; background-color: #fff; 
     }
     .header-title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 0px; }
     .sub-title { text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 8px; }
-    table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; margin-bottom: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
     table td, table th { padding: 6px 8px; vertical-align: top; border: 1px solid #ddd; }
     .no-border td { border: none; padding: 3px 8px; }
     .signature-box { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; }
     .footer-note { margin-top: 20px; font-size: 11px; text-align: center; font-style: italic; }
-    
-    /* OVERRIDE TOTAL UNTUK MODE PRINT */
-    @media print {
-        @page { size: A4 portrait; margin: 10mm; }
-        
-        /* Sembunyikan elemen bawaan UI Streamlit */
-        header, [data-testid="stHeader"] { display: none !important; }
-        
-        /* Ubah background utama jadi putih */
-        .stApp, [data-testid="stAppViewContainer"] { background-color: white !important; background: white !important; }
-        
-        /* Sembunyikan SEMUA elemen, sisakan invoice */
-        body * { visibility: hidden; }
-        .invoice-box, .invoice-box * { visibility: visible; }
-        
-        /* Paksa invoice menutupi layar sepenuhnya tanpa terpengaruh kolom kiri */
-        .invoice-box { 
-            position: absolute !important; 
-            left: 0 !important; 
-            top: 0 !important; 
-            width: 100vw !important; /* Paksa lebar penuh layar */
-            max-width: 100% !important;
-            background-color: white !important; 
-            color: black !important;
-            border: none !important; 
-            box-shadow: none !important; 
-            padding: 0 !important; 
-            margin: 0 !important;
-            font-size: 13px !important; /* Skala diperkecil agar pas 1 halaman */
-            line-height: 18px !important;
-        }
-        
-        /* Pengecilan jarak antar elemen saat diprint */
-        .header-title { font-size: 18px !important; }
-        .sub-title { font-size: 13px !important; margin-bottom: 10px !important; padding-bottom: 5px !important; }
-        table { margin-bottom: 10px !important; }
-        table td, table th { padding: 4px !important; }
-        .no-border td { padding: 2px 4px !important; }
-        .signature-box { margin-top: 15px !important; }
-        .footer-note { margin-top: 15px !important; font-size: 10px !important; }
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -138,24 +97,8 @@ else:
     teks_penutup = "Mohon segera melakukan pelunasan tagihan di atas. Terima kasih telah mempercayakan latihan Anda di Kaumpandak City Waterpark."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
 
-with col_preview:
-    st.header("📄 3. Preview & Cetak")
-    
-    components.html(
-        """
-        <button onclick="window.parent.print()" style="
-            background-color: #008CBA; border: none; color: white; padding: 12px 24px;
-            text-align: center; text-decoration: none; display: block; font-size: 16px;
-            font-weight: bold; margin: 0px 0px 15px 0px; cursor: pointer; border-radius: 6px;
-            width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: Arial, sans-serif;
-        ">
-            🖨️ CETAK INVOICE SEKARANG (PRINT)
-        </button>
-        """,
-        height=60
-    )
-    
-    html_content = f"""<div class="invoice-box">
+# ISI INVOICE
+isi_invoice = f"""
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
 <div class="sub-title">{judul_dokumen}</div>
 <table class="no-border" style="margin-bottom: 15px;">
@@ -186,6 +129,49 @@ with col_preview:
 <div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div>
 </div>
 <div class="footer-note">{teks_footer}</div>
-</div>"""
+"""
 
-    st.markdown(html_content, unsafe_allow_html=True)
+# Bersihkan enter agar tidak rusak di Javascript
+isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '')
+
+with col_preview:
+    st.header("📄 3. Preview & Cetak")
+    
+    # TOMBOL PRINT DENGAN JENDELA BARU (NEW WINDOW)
+    js_print_code = f"""
+    <button onclick="printInvoice()" style="
+        background-color: #008CBA; border: none; color: white; padding: 12px 24px;
+        text-align: center; text-decoration: none; display: block; font-size: 16px;
+        font-weight: bold; margin: 0px 0px 15px 0px; cursor: pointer; border-radius: 6px;
+        width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: Arial, sans-serif;
+    ">
+        🖨️ CETAK INVOICE SEKARANG (PRINT)
+    </button>
+    
+    <script>
+    function printInvoice() {{
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Print Invoice KCW</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write('@page {{ size: A4 portrait; margin: 10mm; }} ');
+        printWindow.document.write('body {{ font-family: Arial, sans-serif; color: #000; padding: 20px; }} ');
+        printWindow.document.write('.header-title {{ text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 0px; }} ');
+        printWindow.document.write('.sub-title {{ text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }} ');
+        printWindow.document.write('table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }} ');
+        printWindow.document.write('table td, table th {{ padding: 6px 8px; vertical-align: top; border: 1px solid #ddd; }} ');
+        printWindow.document.write('.no-border td {{ border: none; padding: 4px 8px; }} ');
+        printWindow.document.write('.signature-box {{ margin-top: 40px; display: flex; justify-content: space-between; text-align: center; }} ');
+        printWindow.document.write('.footer-note {{ margin-top: 30px; font-size: 11px; text-align: center; font-style: italic; }}');
+        printWindow.document.write('</style></head><body>');
+        printWindow.document.write('{isi_invoice_js}');
+        printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+    }}
+    </script>
+    """
+    
+    components.html(js_print_code, height=70)
+    
+    # Render preview di web
+    st.markdown(f'<div class="preview-box">{isi_invoice}</div>', unsafe_allow_html=True)
