@@ -31,7 +31,7 @@ st.markdown("""
     .signature-box { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; }
     .footer-note { margin-top: 20px; font-size: 11px; text-align: center; font-style: italic; }
     
-    /* CSS KOTAK INFORMASI PEMBAYARAN TERSUSUN RAPI KE BAWAH */
+    /* CSS KOTAK INFORMASI PEMBAYARAN: KIRI TRANSFER, KANAN QRIS */
     .payment-info { 
         background-color: #f9f9f9; 
         padding: 12px; 
@@ -39,10 +39,20 @@ st.markdown("""
         border: 1px dashed #ccc; 
         margin-top: 15px; 
         font-size: 13px; 
-        line-height: 20px;
+        line-height: 19px;
     }
-    .payment-row {
-        margin-bottom: 8px;
+    .payment-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .payment-left {
+        flex: 1.2;
+    }
+    .payment-right {
+        flex: 0.8;
+        text-align: center;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -104,7 +114,6 @@ cb_tunai = "☑" if metode == "Tunai" else "☐"
 cb_transfer = "☑" if metode == "Transfer" else "☐"
 cb_qris = "☑" if metode == "QRIS" else "☐"
 
-# Logika Dinamis Berdasarkan Status
 qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
 
 if status_pembayaran == "LUNAS":
@@ -113,7 +122,6 @@ if status_pembayaran == "LUNAS":
     label_tanggal = "TANGGAL PEMBAYARAN"
     teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
     teks_footer = "Dokumen ini merupakan bukti pembayaran yang sah setelah pembayaran diterima oleh pihak Kaumpandak City Waterpark."
-    # Jika LUNAS, info pembayaran kosong/tidak dimunculkan
     info_pembayaran_html = ""
 else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
@@ -121,13 +129,24 @@ else:
     label_tanggal = "TANGGAL INVOICE"
     teks_penutup = "Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini. Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
-    # Jika BELUM LUNAS, info pembayaran muncul tersusun rapi ke bawah
+    
+    # Kiri: Transfer Bank, Kanan: Gambar QRIS
     info_pembayaran_html = f"""
     <div class="payment-info">
-        <div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">INFORMASI PEMBAYARAN:</div>
-        <div class="payment-row"><b>1. Transfer Bank:</b><br>&nbsp;&nbsp;&nbsp;&nbsp;• Bank BCA<br>&nbsp;&nbsp;&nbsp;&nbsp;• No. Rekening: <b>1234567890</b><br>&nbsp;&nbsp;&nbsp;&nbsp;• Atas Nama: Kaumpandak City Waterpark</div>
-        <div class="payment-row" style="margin-top: 8px;"><b>2. Pembayaran via QRIS:</b><br>&nbsp;&nbsp;&nbsp;&nbsp;• Silakan scan QR Code resmi di bawah ini:</div>
-        <div style='text-align: center; margin-top: 6px;'><img src='{qris_direct_url}' width='100'></div>
+        <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">INFORMASI PEMBAYARAN:</div>
+        <div class="payment-container">
+            <div class="payment-left">
+                <b>Transfer Bank:</b><br>
+                • Bank BCA<br>
+                • No. Rek: <b>1234567890</b><br>
+                • Atas Nama: Kaumpandak City Waterpark
+            </div>
+            <div class="payment-right">
+                <b>QRIS:</b><br>
+                <img src='{qris_direct_url}' width='90' style='margin-top: 4px;'><br>
+                <span style='font-size: 10px; color: #555;'>Scan untuk Bayar</span>
+            </div>
+        </div>
     </div>
     """
 
@@ -195,7 +214,9 @@ with col_preview:
         printWindow.document.write('.signature-box {{ margin-top: 25px; display: flex; justify-content: space-between; text-align: center; }} ');
         printWindow.document.write('.footer-note {{ margin-top: 15px; font-size: 10px; text-align: center; font-style: italic; }}');
         printWindow.document.write('.payment-info {{ background-color: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px dashed #ccc; margin-top: 10px; font-size: 12px; line-height: 18px; }}');
-        printWindow.document.write('.payment-row {{ margin-bottom: 6px; }}');
+        printWindow.document.write('.payment-container {{ display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }}');
+        printWindow.document.write('.payment-left {{ flex: 1.2; }}');
+        printWindow.document.write('.payment-right {{ flex: 0.8; text-align: center; }}');
         printWindow.document.write('</style></head><body>');
         printWindow.document.write('{isi_invoice_js}');
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
