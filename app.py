@@ -139,13 +139,12 @@ else:
         <div style="font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">INFORMASI PEMBAYARAN:</div>
         <div class="payment-container">
             <div class="payment-left"><b>Transfer Bank:</b><br>• Bank BCA | No. Rek: <b>1234567890</b><br>• a.n. Kaumpandak City Waterpark</div>
-            <div class="payment-right"><b>QRIS:</b><br><img src='{qris_direct_url}' width='45' style='margin-top: 2px;'><br><span style='font-size: 8px; color: #555;'>Scan untuk Bayar</span></div>
+            <div class="payment-right"><b>QRIS:</b><br><img src="{qris_direct_url}" width="45" style="margin-top: 2px;"><br><span style="font-size: 8px; color: #555;">Scan untuk Bayar</span></div>
         </div>
     </div>
     """
     penutup_html = f"""<p style="margin-top:6px; margin-bottom: 6px;">{teks_penutup}</p>"""
 
-# Susunan HTML Invoice Bersih
 isi_invoice = f"""
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
 <div class="sub-title">{judul_dokumen}</div>
@@ -175,13 +174,10 @@ isi_invoice = f"""
 <div class="footer-note">{teks_footer}</div>
 """
 
-# Escape string agar aman dibaca oleh Javascript pembuka jendela baru
-isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
-
+# Menggunakan triple quote pengaman agar tidak terjadi SyntaxError string literal
 with col_preview:
     st.header("📄 3. Preview & Cetak")
     
-    # Tombol Cetak Menggunakan New Window (100% Bersih, Tanpa Blok Hitam, Pas A4)
     js_print_code = f"""
     <button onclick="printInvoice()" style="
         background-color: #008CBA; border: none; color: white; padding: 12px 24px;
@@ -211,7 +207,7 @@ with col_preview:
         printWindow.document.write('.payment-left {{ flex: 1.2; }}');
         printWindow.document.write('.payment-right {{ flex: 0.8; text-align: center; }}');
         printWindow.document.write('</style></head><body>');
-        printWindow.document.write("{isi_invoice_js}");
+        printWindow.document.write(`{isi_invoice}`);
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
         printWindow.document.write('</body></html>');
         printWindow.document.close();
@@ -221,5 +217,4 @@ with col_preview:
     
     components.html(js_print_code, height=70)
     
-    # Preview di Web Streamlit
     st.markdown(f'<div class="preview-box">{isi_invoice}</div>', unsafe_allow_html=True)
