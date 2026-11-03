@@ -20,7 +20,7 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS PREVIEW & CETAK YANG RAPI ---
+# --- CSS PREVIEW & CETAK PROFESIONAL ---
 st.markdown("""
     <style>
     .preview-box { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 13px; line-height: 18px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
@@ -32,7 +32,10 @@ st.markdown("""
     .signature-box { margin-top: 15px; display: flex; justify-content: space-between; text-align: center; font-size: 13px; }
     .footer-note { margin-top: 8px; font-size: 10px; text-align: center; font-style: italic; }
     
-    .payment-box { background-color: #fcfcfc; padding: 8px 10px; border: 1px solid #ccc; margin-top: 6px; font-size: 12px; line-height: 16px; }
+    /* Desain Kotak Pembayaran Modern & Elegan */
+    .payment-card { background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 6px; padding: 10px 12px; margin-top: 6px; font-size: 12px; line-height: 16px; }
+    .bank-info { border-right: 1px solid #ddd; padding-right: 10px; }
+    .qris-info { text-align: center; padding-left: 10px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -101,10 +104,12 @@ cb_qris = "☑" if metode == "QRIS" else "☐"
 
 qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
 
+# Label dinamis berdasarkan status dokumen
 if status_pembayaran == "LUNAS":
     judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE PEMBAYARAN DITERIMA |"
     label_status = "<strong>LUNAS ✓</strong>"
     label_tanggal = "TANGGAL PEMBAYARAN"
+    label_penerima = "DITERIMA DARI:"
     teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
     teks_footer = "Dokumen ini merupakan bukti pembayaran yang sah setelah pembayaran diterima oleh pihak Kaumpandak City Waterpark."
     
@@ -115,27 +120,28 @@ else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
     label_status = "<strong>BELUM LUNAS ⏳</strong>"
     label_tanggal = "TANGGAL INVOICE"
+    label_penerima = "DITAGIHKAN KEPADA:"
     teks_penutup = "Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
     
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 4px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
     
-    # Menggunakan tabel internal yang rapi sejajar tanpa elemen teks mentah acak-acakan
+    # Kotak Informasi Pembayaran yang Elegan, Rapi, dan Profesional
     info_pembayaran_html = f"""
-    <p style="margin-top:6px; margin-bottom: 4px;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
-    <div class="payment-box">
+    <p style="margin-top:6px; margin-bottom: 4px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
+    <div class="payment-card">
         <table style="width: 100%; border: none; margin-bottom: 0px;">
         <tr style="background-color: transparent;">
-            <td style="border: none; width: 60%; vertical-align: top; padding: 0px;">
-                <strong>TRANSFER BANK:</strong><br>
+            <td class="bank-info" style="border: none; width: 55%; vertical-align: top; padding: 0px;">
+                <span style="font-weight: bold; color: #333;">TRANSFER BANK:</span><br>
                 • Bank BCA<br>
                 • No. Rek: <b>1234567890</b><br>
                 • a.n. Kaumpandak City Waterpark
             </td>
-            <td style="border: none; width: 40%; vertical-align: top; text-align: center; padding: 0px;">
-                <strong>QRIS:</strong><br>
-                <img src="{qris_direct_url}" width="45" style="margin-top: 2px;"><br>
-                <span style="font-size: 8px; color: #555;">Scan untuk Bayar</span>
+            <td class="qris-info" style="border: none; width: 45%; vertical-align: top; padding: 0px;">
+                <span style="font-weight: bold; color: #333;">PEMBAYARAN QRIS:</span><br>
+                <img src="{qris_direct_url}" width="50" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff;"><br>
+                <span style="font-size: 8px; color: #666;">Scan untuk Melakukan Pembayaran</span>
             </td>
         </tr>
         </table>
@@ -143,7 +149,37 @@ else:
     """
     penutup_html = f"""<p style="margin-top:6px; margin-bottom: 6px;">{teks_penutup}</p>"""
 
-isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr></table><strong>DITERIMA DARI:</strong><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><strong>RINCIAN PEMBAYARAN:</strong><table><tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
+# Susunan Akhir HTML Invoice
+isi_invoice = f"""
+<div class="preview-box">
+<div class="header-title">KAUMPANDAK CITY WATERPARK</div>
+<div class="sub-title">{judul_dokumen}</div>
+<table class="no-border" style="margin-bottom: 6px;">
+<tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr>
+<tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr>
+<tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr>
+</table>
+<strong>{label_penerima}</strong>
+<table class="no-border" style="margin-bottom: 6px;">
+<tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr>
+<tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr>
+<tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr>
+</table>
+<strong>RINCIAN PEMBAYARAN:</strong>
+<table>
+<tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr>
+<tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr>
+</table>
+{metode_pembayaran_html}
+{info_pembayaran_html}
+{penutup_html}
+<div class="signature-box">
+<div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div>
+<div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div>
+</div>
+<div class="footer-note">{teks_footer}</div>
+</div>
+"""
 
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
 
@@ -174,7 +210,9 @@ with col_preview:
         printWindow.document.write('.no-border td {{ border: none; padding: 2px 6px; }} ');
         printWindow.document.write('.signature-box {{ margin-top: 15px; display: flex; justify-content: space-between; text-align: center; font-size: 13px; }} ');
         printWindow.document.write('.footer-note {{ margin-top: 8px; font-size: 10px; text-align: center; font-style: italic; }}');
-        printWindow.document.write('.payment-box {{ background-color: #fcfcfc; padding: 8px 10px; border: 1px solid #ccc; margin-top: 6px; font-size: 12px; line-height: 16px; }}');
+        printWindow.document.write('.payment-card {{ background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 6px; padding: 10px 12px; margin-top: 6px; font-size: 12px; line-height: 16px; }}');
+        printWindow.document.write('.bank-info {{ border-right: 1px solid #ddd; padding-right: 10px; }}');
+        printWindow.document.write('.qris-info {{ text-align: center; padding-left: 10px; }}');
         printWindow.document.write('</style></head><body>');
         printWindow.document.write(`{isi_invoice}`);
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
