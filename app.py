@@ -20,21 +20,35 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS YANG DIOPTIMALKAN AGAR PAS & PROPOSIONAL DI A4 ---
+# --- CSS PREVIEW PROPORSIONAL UKURAN A4 ---
 st.markdown("""
     <style>
-    .preview-box { max-width: 800px; margin: auto; padding: 30px 35px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 14px; line-height: 22px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
-    .header-title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 2px; }
-    .sub-title { text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 18px; border-bottom: 2px solid #000; padding-bottom: 8px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }
-    table td, table th { padding: 7px 10px; vertical-align: top; border: 1px solid #ddd; }
-    .no-border td { border: none; padding: 4px 8px; }
-    .signature-box { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; font-size: 14px; }
-    .footer-note { margin-top: 25px; font-size: 11px; text-align: center; font-style: italic; }
+    .preview-box { 
+        width: 100%; 
+        max-width: 680px; 
+        aspect-ratio: 1 / 1.414; /* Rasio presisi kertas A4 */
+        margin: auto; 
+        padding: 35px 40px; 
+        border: 1px solid #ccc; 
+        box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+        font-size: 13px; 
+        line-height: 19px; 
+        font-family: Arial, sans-serif; 
+        color: #000; 
+        background-color: #fff; 
+        box-sizing: border-box;
+    }
+    .header-title { text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 2px; }
+    .sub-title { text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 14px; border-bottom: 2px solid #000; padding-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+    table td, table th { padding: 5px 8px; vertical-align: top; border: 1px solid #ddd; }
+    .no-border td { border: none; padding: 3px 6px; }
+    .signature-box { margin-top: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 13px; }
+    .footer-note { margin-top: 20px; font-size: 10px; text-align: center; font-style: italic; }
     
-    .payment-card { background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 6px; padding: 12px 15px; margin-top: 10px; font-size: 13px; line-height: 20px; }
-    .bank-info { border-right: 1px solid #ddd; padding-right: 15px; }
-    .qris-info { text-align: center; padding-left: 15px; }
+    .payment-card { background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 6px; padding: 10px 12px; margin-top: 8px; font-size: 12px; line-height: 17px; }
+    .bank-info { border-right: 1px solid #ddd; padding-right: 10px; }
+    .qris-info { text-align: center; padding-left: 10px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -111,9 +125,9 @@ if status_pembayaran == "LUNAS":
     teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
     teks_footer = "Dokumen ini merupakan bukti pembayaran yang sah setelah pembayaran diterima oleh pihak Kaumpandak City Waterpark."
     
-    metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp; {cb_qris} QRIS</td></tr><tr><td>Keterangan / Referensi</td><td>:</td><td>{referensi}</td></tr><tr><td><strong>TOTAL DIBAYAR</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
+    metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 10px;"><tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp; {cb_qris} QRIS</td></tr><tr><td>Keterangan / Referensi</td><td>:</td><td>{referensi}</td></tr><tr><td><strong>TOTAL DIBAYAR</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
     info_pembayaran_html = ""
-    penutup_html = f"""<p style="margin-top:12px; margin-bottom: 12px;">{teks_penutup}</p>"""
+    penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px;">{teks_penutup}</p>"""
 else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
     label_status = "<strong>BELUM LUNAS ⏳</strong>"
@@ -122,10 +136,10 @@ else:
     teks_penutup = "Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
     
-    metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
+    metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 10px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
     
     info_pembayaran_html = f"""
-    <p style="margin-top:12px; margin-bottom: 8px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
+    <p style="margin-top:10px; margin-bottom: 6px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
     <div class="payment-card">
         <table style="width: 100%; border: none; margin-bottom: 0px;">
         <tr style="background-color: transparent;">
@@ -137,16 +151,16 @@ else:
             </td>
             <td class="qris-info" style="border: none; width: 45%; vertical-align: top; padding: 0px;">
                 <span style="font-weight: bold; color: #333;">PEMBAYARAN QRIS:</span><br>
-                <img src="{qris_direct_url}" width="65" style="margin-top: 4px; border: 1px solid #ccc; padding: 2px; background: #fff;"><br>
-                <span style="font-size: 9px; color: #666;">Scan untuk Melakukan Pembayaran</span>
+                <img src="{qris_direct_url}" width="60" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff;"><br>
+                <span style="font-size: 8px; color: #666;">Scan untuk Melakukan Pembayaran</span>
             </td>
         </tr>
         </table>
     </div>
     """
-    penutup_html = f"""<p style="margin-top:12px; margin-bottom: 12px;">{teks_penutup}</p>"""
+    penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px;">{teks_penutup}</p>"""
 
-isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr></table><strong>{label_penerima}</strong><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><strong>RINCIAN PEMBAYARAN:</strong><table><tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
+isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 10px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr></table><strong>{label_penerima}</strong><table class="no-border" style="margin-bottom: 10px;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><strong>RINCIAN PEMBAYARAN:</strong><table><tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
 
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
 
@@ -169,17 +183,18 @@ with col_preview:
         printWindow.document.write('<html><head><title>Print Invoice KCW</title>');
         printWindow.document.write('<style>');
         printWindow.document.write('@page {{ size: A4 portrait; margin: 10mm; }} ');
-        printWindow.document.write('body {{ font-family: Arial, sans-serif; color: #000; padding: 10px; font-size: 14px; line-height: 22px; }} ');
-        printWindow.document.write('.header-title {{ text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 2px; }} ');
-        printWindow.document.write('.sub-title {{ text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 18px; border-bottom: 2px solid #000; padding-bottom: 8px; }} ');
-        printWindow.document.write('table {{ width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px; }} ');
-        printWindow.document.write('table td, table th {{ padding: 7px 10px; vertical-align: top; border: 1px solid #ddd; }} ');
-        printWindow.document.write('.no-border td {{ border: none; padding: 4px 8px; }} ');
-        printWindow.document.write('.signature-box {{ margin-top: 30px; display: flex; justify-content: space-between; text-align: center; font-size: 14px; }} ');
-        printWindow.document.write('.footer-note {{ margin-top: 25px; font-size: 11px; text-align: center; font-style: italic; }}');
-        printWindow.document.write('.payment-card {{ background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 6px; padding: 12px 15px; margin-top: 10px; font-size: 13px; line-height: 20px; }}');
-        printWindow.document.write('.bank-info {{ border-right: 1px solid #ddd; padding-right: 15px; }}');
-        printWindow.document.write('.qris-info {{ text-align: center; padding-left: 15px; }}');
+        printWindow.document.write('body {{ font-family: Arial, sans-serif; color: #000; padding: 0; margin: 0; font-size: 13px; line-height: 19px; }} ');
+        printWindow.document.write('.preview-box {{ width: 100% !important; max-width: 100% !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }} ');
+        printWindow.document.write('.header-title {{ text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 2px; }} ');
+        printWindow.document.write('.sub-title {{ text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 14px; border-bottom: 2px solid #000; padding-bottom: 6px; }} ');
+        printWindow.document.write('table {{ width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }} ');
+        printWindow.document.write('table td, table th {{ padding: 5px 8px; vertical-align: top; border: 1px solid #ddd; }} ');
+        printWindow.document.write('.no-border td {{ border: none; padding: 3px 6px; }} ');
+        printWindow.document.write('.signature-box {{ margin-top: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 13px; }} ');
+        printWindow.document.write('.footer-note {{ margin-top: 20px; font-size: 10px; text-align: center; font-style: italic; }}');
+        printWindow.document.write('.payment-card {{ background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 6px; padding: 10px 12px; margin-top: 8px; font-size: 12px; line-height: 17px; }}');
+        printWindow.document.write('.bank-info {{ border-right: 1px solid #ddd; padding-right: 10px; }}');
+        printWindow.document.write('.qris-info {{ text-align: center; padding-left: 10px; }}');
         printWindow.document.write('</style></head><body>');
         printWindow.document.write("{isi_invoice_js}");
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
