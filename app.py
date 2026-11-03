@@ -118,16 +118,26 @@ else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
     label_status = "<strong>BELUM LUNAS ⏳</strong>"
     label_tanggal = "TANGGAL INVOICE"
-    teks_penutup = "Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini. Terima kasih."
+    teks_penutup = "Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
     
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 4px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
-    info_pembayaran_html = f"""<div class="payment-info"><div style="font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">INFORMASI PEMBAYARAN:</div><div class="payment-container"><div class="payment-left"><b>Transfer Bank:</b><br>• Bank BCA | No. Rek: <b>1234567890</b><br>• a.n. Kaumpandak City Waterpark</div><div class="payment-right"><b>QRIS:</b><br><img src="{qris_direct_url}" width="45" style="margin-top: 2px;"><br><span style="font-size: 8px; color: #555;">Scan untuk Bayar</span></div></div></div>"""
+    
+    # Kalimat pengantar diletakkan di ATAS kotak informasi pembayaran
+    info_pembayaran_html = f"""
+    <p style="margin-top:6px; margin-bottom: 4px;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
+    <div class="payment-info">
+        <div style="font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">INFORMASI PEMBAYARAN:</div>
+        <div class="payment-container">
+            <div class="payment-left"><b>Transfer Bank:</b><br>• Bank BCA | No. Rek: <b>1234567890</b><br>• a.n. Kaumpandak City Waterpark</div>
+            <div class="payment-right"><b>QRIS:</b><br><img src="{qris_direct_url}" width="45" style="margin-top: 2px;"><br><span style="font-size: 8px; color: #555;">Scan untuk Bayar</span></div>
+        </div>
+    </div>
+    """
     penutup_html = f"""<p style="margin-top:6px; margin-bottom: 6px;">{teks_penutup}</p>"""
 
 isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr></table><strong>DITERIMA DARI:</strong><table class="no-border" style="margin-bottom: 6px;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><strong>RINCIAN PEMBAYARAN:</strong><table><tr style="background-color: #f2f2f2;"><th width="5%">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">JML PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
 
-# Amankan string untuk Javascript window.open
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
 
 with col_preview:
@@ -162,7 +172,7 @@ with col_preview:
         printWindow.document.write('.payment-left {{ flex: 1.2; }}');
         printWindow.document.write('.payment-right {{ flex: 0.8; text-align: center; }}');
         printWindow.document.write('</style></head><body>');
-        printWindow.document.write("{isi_invoice_js}");
+        printWindow.document.write(`{isi_invoice}`);
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
         printWindow.document.write('</body></html>');
         printWindow.document.close();
