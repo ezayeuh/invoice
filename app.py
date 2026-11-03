@@ -30,6 +30,7 @@ st.markdown("""
     .no-border td { border: none; padding: 3px 8px; }
     .signature-box { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; }
     .footer-note { margin-top: 20px; font-size: 11px; text-align: center; font-style: italic; }
+    .payment-info { background-color: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px dashed #ccc; margin-top: 10px; font-size: 13px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -78,12 +79,18 @@ with col_input:
     nama_pj = st.text_input("Nama Penanggung Jawab", "Bpk/Ibu ...")
     no_kontak = st.text_input("Nomor Kontak", "-")
     
-    # INPUT BARU DITAMBAHKAN DI SINI
     keterangan_tabel = st.text_input("Keterangan di Tabel", "Pembayaran bulanan club renang")
     periode = st.text_input("Periode Latihan", "Oktober 2026")
     total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
     metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"], horizontal=True)
     referensi = st.text_input("Keterangan / Ref. Pembayaran", "-")
+    
+    st.subheader("💳 Info Rekening & QRIS")
+    bank_nama = st.text_input("Nama Bank", "BCA")
+    no_rekening = st.text_input("Nomor Rekening", "1234567890")
+    rekening_a_n = st.text_input("Atas Nama Rekening", "Kaumpandak City Waterpark")
+    qris_image_url = st.text_input("Link / URL Gambar QRIS (Opsional)", "")
+    
     petugas = st.text_input("Penerima/Petugas", "Admin KCW")
 
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
@@ -101,8 +108,18 @@ else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE MENUNGGU PEMBAYARAN |"
     label_status = "<strong>BELUM LUNAS ⏳</strong>"
     label_tanggal = "TANGGAL INVOICE"
-    teks_penutup = "Mohon segera melakukan pelunasan tagihan di atas. Terima kasih telah mempercayakan latihan Anda di Kaumpandak City Waterpark."
+    teks_penutup = "Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini. Terima kasih."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
+
+# Blok Informasi Tambahan Rekening / QRIS untuk ditampilkan di dalam Invoice
+info_pembayaran_html = f"""
+<div class="payment-info">
+    <strong>INFORMASI PEMBAYARAN:</strong><br>
+    • <b>Transfer Bank:</b> Bank {bank_nama} No. Rek: <b>{no_rekening}</b> a.n. {rekening_a_n}<br>
+    • <b>QRIS:</b> Silakan scan QR Code resmi Kaumpandak City Waterpark di bawah ini:<br>
+    {"<div style='text-align: center; margin-top: 8px;'><img src='" + qris_image_url + "' width='120'></div>" if qris_image_url else "<em style='color: #666;'>[ Lampiran QR Code QRIS ]</em>"}
+</div>
+"""
 
 isi_invoice = f"""
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
@@ -129,6 +146,7 @@ isi_invoice = f"""
 <tr><td><strong>TOTAL TAGIHAN</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr>
 <tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr>
 </table>
+{info_pembayaran_html}
 <p style="margin-top:15px;">{teks_penutup}</p>
 <div class="signature-box">
 <div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div>
@@ -166,6 +184,7 @@ with col_preview:
         printWindow.document.write('.no-border td {{ border: none; padding: 4px 8px; }} ');
         printWindow.document.write('.signature-box {{ margin-top: 40px; display: flex; justify-content: space-between; text-align: center; }} ');
         printWindow.document.write('.footer-note {{ margin-top: 30px; font-size: 11px; text-align: center; font-style: italic; }}');
+        printWindow.document.write('.payment-info {{ background-color: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px dashed #ccc; margin-top: 10px; font-size: 13px; }}');
         printWindow.document.write('</style></head><body>');
         printWindow.document.write('{isi_invoice_js}');
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
