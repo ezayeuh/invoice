@@ -5,7 +5,6 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Auto Invoice Club Renang", layout="wide")
 
-# --- FUNGSI TERBILANG OTOMATIS (RUPIAH) ---
 def terbilang(n):
     angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"]
     if n < 12: return angka[int(n)]
@@ -21,7 +20,7 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS UNTUK PRINT A4 (DIOPTIMALKAN 1 HALAMAN) ---
+# --- CSS PRINT AGRESIF ---
 st.markdown("""
     <style>
     .invoice-box { 
@@ -37,22 +36,45 @@ st.markdown("""
     .signature-box { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; }
     .footer-note { margin-top: 20px; font-size: 11px; text-align: center; font-style: italic; }
     
+    /* OVERRIDE TOTAL UNTUK MODE PRINT */
     @media print {
-        @page {
-            size: A4 portrait;
-            margin: 10mm;
-        }
+        @page { size: A4 portrait; margin: 10mm; }
+        
+        /* Sembunyikan elemen bawaan UI Streamlit */
+        header, [data-testid="stHeader"] { display: none !important; }
+        
+        /* Ubah background utama jadi putih */
+        .stApp, [data-testid="stAppViewContainer"] { background-color: white !important; background: white !important; }
+        
+        /* Sembunyikan SEMUA elemen, sisakan invoice */
         body * { visibility: hidden; }
         .invoice-box, .invoice-box * { visibility: visible; }
+        
+        /* Paksa invoice menutupi layar sepenuhnya tanpa terpengaruh kolom kiri */
         .invoice-box { 
-            position: absolute; left: 0; top: 0; width: 100%; 
-            border: none; box-shadow: none; padding: 0; margin: 0;
-            font-size: 14px; /* Ukuran font diperkecil sedikit agar muat 1 halaman */
-            line-height: 20px;
+            position: absolute !important; 
+            left: 0 !important; 
+            top: 0 !important; 
+            width: 100vw !important; /* Paksa lebar penuh layar */
+            max-width: 100% !important;
+            background-color: white !important; 
+            color: black !important;
+            border: none !important; 
+            box-shadow: none !important; 
+            padding: 0 !important; 
+            margin: 0 !important;
+            font-size: 13px !important; /* Skala diperkecil agar pas 1 halaman */
+            line-height: 18px !important;
         }
-        .header-title { font-size: 20px; }
-        .signature-box { margin-top: 20px; }
-        .stApp { background-color: white; }
+        
+        /* Pengecilan jarak antar elemen saat diprint */
+        .header-title { font-size: 18px !important; }
+        .sub-title { font-size: 13px !important; margin-bottom: 10px !important; padding-bottom: 5px !important; }
+        table { margin-bottom: 10px !important; }
+        table td, table th { padding: 4px !important; }
+        .no-border td { padding: 2px 4px !important; }
+        .signature-box { margin-top: 15px !important; }
+        .footer-note { margin-top: 15px !important; font-size: 10px !important; }
     }
     </style>
 """, unsafe_allow_html=True)
