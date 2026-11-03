@@ -20,7 +20,7 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS PREVIEW DI LAYAR STREAMLIT ---
+# --- CSS PREVIEW & CETAK YANG RAPI ---
 st.markdown("""
     <style>
     .preview-box { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 13px; line-height: 18px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
@@ -32,10 +32,7 @@ st.markdown("""
     .signature-box { margin-top: 15px; display: flex; justify-content: space-between; text-align: center; font-size: 13px; }
     .footer-note { margin-top: 8px; font-size: 10px; text-align: center; font-style: italic; }
     
-    .payment-info { background-color: #f9f9f9; padding: 8px 10px; border-radius: 4px; border: 1px dashed #ccc; margin-top: 6px; font-size: 12px; line-height: 16px; }
-    .payment-container { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .payment-left { flex: 1.2; }
-    .payment-right { flex: 0.8; text-align: center; }
+    .payment-box { background-color: #fcfcfc; padding: 8px 10px; border: 1px solid #ccc; margin-top: 6px; font-size: 12px; line-height: 16px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -123,15 +120,25 @@ else:
     
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 4px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
     
-    # Kalimat pengantar diletakkan di ATAS kotak informasi pembayaran
+    # Menggunakan tabel internal yang rapi sejajar tanpa elemen teks mentah acak-acakan
     info_pembayaran_html = f"""
     <p style="margin-top:6px; margin-bottom: 4px;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
-    <div class="payment-info">
-        <div style="font-weight: bold; margin-bottom: 2px; border-bottom: 1px solid #ddd; padding-bottom: 2px;">INFORMASI PEMBAYARAN:</div>
-        <div class="payment-container">
-            <div class="payment-left"><b>Transfer Bank:</b><br>• Bank BCA | No. Rek: <b>1234567890</b><br>• a.n. Kaumpandak City Waterpark</div>
-            <div class="payment-right"><b>QRIS:</b><br><img src="{qris_direct_url}" width="45" style="margin-top: 2px;"><br><span style="font-size: 8px; color: #555;">Scan untuk Bayar</span></div>
-        </div>
+    <div class="payment-box">
+        <table style="width: 100%; border: none; margin-bottom: 0px;">
+        <tr style="background-color: transparent;">
+            <td style="border: none; width: 60%; vertical-align: top; padding: 0px;">
+                <strong>TRANSFER BANK:</strong><br>
+                • Bank BCA<br>
+                • No. Rek: <b>1234567890</b><br>
+                • a.n. Kaumpandak City Waterpark
+            </td>
+            <td style="border: none; width: 40%; vertical-align: top; text-align: center; padding: 0px;">
+                <strong>QRIS:</strong><br>
+                <img src="{qris_direct_url}" width="45" style="margin-top: 2px;"><br>
+                <span style="font-size: 8px; color: #555;">Scan untuk Bayar</span>
+            </td>
+        </tr>
+        </table>
     </div>
     """
     penutup_html = f"""<p style="margin-top:6px; margin-bottom: 6px;">{teks_penutup}</p>"""
@@ -167,10 +174,7 @@ with col_preview:
         printWindow.document.write('.no-border td {{ border: none; padding: 2px 6px; }} ');
         printWindow.document.write('.signature-box {{ margin-top: 15px; display: flex; justify-content: space-between; text-align: center; font-size: 13px; }} ');
         printWindow.document.write('.footer-note {{ margin-top: 8px; font-size: 10px; text-align: center; font-style: italic; }}');
-        printWindow.document.write('.payment-info {{ background-color: #f9f9f9; padding: 8px 10px; border-radius: 4px; border: 1px dashed #ccc; margin-top: 6px; font-size: 12px; line-height: 16px; }}');
-        printWindow.document.write('.payment-container {{ display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }}');
-        printWindow.document.write('.payment-left {{ flex: 1.2; }}');
-        printWindow.document.write('.payment-right {{ flex: 0.8; text-align: center; }}');
+        printWindow.document.write('.payment-box {{ background-color: #fcfcfc; padding: 8px 10px; border: 1px solid #ccc; margin-top: 6px; font-size: 12px; line-height: 16px; }}');
         printWindow.document.write('</style></head><body>');
         printWindow.document.write(`{isi_invoice}`);
         printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
