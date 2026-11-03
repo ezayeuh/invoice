@@ -20,7 +20,7 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# CSS HANYA UNTUK TAMPILAN PREVIEW DI LAYAR STREAMLIT (TIDAK DIPAKAI SAAT PRINT)
+# CSS HANYA UNTUK TAMPILAN PREVIEW DI LAYAR STREAMLIT
 st.markdown("""
     <style>
     .preview-box { 
@@ -54,14 +54,26 @@ with col_input:
     default_club_name = "Nama Club..."
     if uploaded_file is not None:
         try:
-            df = pd.read_excel(uploaded_file)
-            col_nama = [col for col in df.columns if 'NAMA' in str(col).upper()]
-            if col_nama:
+            # Membaca file tanpa header langsung agar bisa mencari posisi judul tabel
+            df_raw = pd.read_excel(uploaded_file, header=None)
+            
+            header_row_idx = -1
+            # Mencari baris yang mengandung kata NAMA (maks 20 baris pertama)
+            for i in range(min(20, len(df_raw))):
+                if df_raw.iloc[i].astype(str).str.upper().str.contains('NAMA').any():
+                    header_row_idx = i
+                    break
+            
+            if header_row_idx != -1:
+                df_raw.columns = df_raw.iloc[header_row_idx]
+                df = df_raw.iloc[header_row_idx + 1:].reset_index(drop=True)
+                col_nama = [col for col in df_raw.columns if 'NAMA' in str(col).upper()]
+                
                 valid_rows = df[df[col_nama[0]].notna()]
-                valid_rows = valid_rows[~valid_rows[col_nama[0]].astype(str).str.contains("JUMLAH", case=False)]
+                valid_rows = valid_rows[~valid_rows[col_nama[0]].astype(str).str.contains("JUMLAH|NAMA", case=False)]
                 jml_peserta = len(valid_rows)
             else:
-                jml_peserta = max(0, len(df) - 1)
+                jml_peserta = max(0, len(df_raw) - 1)
                 
             total_bayar = jml_peserta * tarif_per_orang
             st.success(f"✅ Data Terbaca! Peserta: **{jml_peserta}** | Tagihan: **{format_rupiah(total_bayar)}**")
@@ -97,7 +109,7 @@ else:
     teks_penutup = "Mohon segera melakukan pelunasan tagihan di atas. Terima kasih telah mempercayakan latihan Anda di Kaumpandak City Waterpark."
     teks_footer = "Dokumen ini merupakan rincian tagihan resmi yang diterbitkan oleh manajemen Kaumpandak City Waterpark."
 
-# ISI INVOICE
+# ISI HTML INVOICE
 isi_invoice = f"""
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
 <div class="sub-title">{judul_dokumen}</div>
@@ -131,13 +143,13 @@ isi_invoice = f"""
 <div class="footer-note">{teks_footer}</div>
 """
 
-# Bersihkan enter agar tidak rusak di Javascript
+# Bersihkan karakter baris baru (enter) agar string aman dijalankan oleh Javascript
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '')
 
 with col_preview:
     st.header("📄 3. Preview & Cetak")
     
-    # TOMBOL PRINT DENGAN JENDELA BARU (NEW WINDOW)
+    # TOMBOL PRINT MEMBUKA JENDELA BARU BERISI INVOICE BERSIH
     js_print_code = f"""
     <button onclick="printInvoice()" style="
         background-color: #008CBA; border: none; color: white; padding: 12px 24px;
@@ -173,5 +185,5 @@ with col_preview:
     
     components.html(js_print_code, height=70)
     
-    # Render preview di web
+    # Render preview invoice di Web
     st.markdown(f'<div class="preview-box">{isi_invoice}</div>', unsafe_allow_html=True)
