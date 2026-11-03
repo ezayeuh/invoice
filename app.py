@@ -20,7 +20,7 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS PREVIEW PAS A4 TANPA SPACE KOSONG BERLEBIHAN ---
+# --- CSS PREVIEW PAS A4 ---
 st.markdown("""
     <style>
     .preview-box { 
@@ -91,7 +91,7 @@ with col_input:
         except Exception as e:
             st.error(f"Gagal membaca Excel: {e}")
 
-    no_invoice = st.text_input("No. Invoice", f"INV/KCW/{datetime.today().year}/{datetime.today().month:02d}-XXX")
+    no_invoice = st.text_input("No. Invoice", f"INV-KCW-{datetime.today().year}-{datetime.today().month:02d}-XXX")
     tgl_bayar = st.date_input("Tanggal Dokumen", datetime.today())
     nama_club = st.text_input("Nama Club Renang", default_club_name)
     nama_pj = st.text_input("Nama Penanggung Jawab", "Bpk/Ibu ...")
@@ -116,6 +116,11 @@ cb_transfer = "☑" if metode == "Transfer" else "☐"
 cb_qris = "☑" if metode == "QRIS" else "☐"
 
 qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
+
+# Menggabungkan Nama Club dan No Invoice untuk Nama File Download
+clean_club = "".join(c for c in nama_club if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
+clean_inv = "".join(c for c in no_invoice if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
+safe_filename = f"{clean_club}_{clean_inv}.pdf"
 
 if status_pembayaran == "LUNAS":
     judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE PEMBAYARAN DITERIMA |"
@@ -180,7 +185,7 @@ with col_preview:
     <script>
     function printInvoice() {{
         var printWindow = window.open('', '_blank');
-        printWindow.document.write('<html><head><title>Print Invoice KCW</title>');
+        printWindow.document.write('<html><head><title>{safe_filename}</title>');
         printWindow.document.write('<style>');
         printWindow.document.write('@page {{ size: A4 portrait; margin: 10mm; }} ');
         printWindow.document.write('body {{ font-family: Arial, sans-serif; color: #000; padding: 0; margin: 0; font-size: 13.5px; line-height: 20px; }} ');
@@ -197,7 +202,7 @@ with col_preview:
         printWindow.document.write('.qris-info {{ text-align: center; padding-left: 10px; }}');
         printWindow.document.write('</style></head><body>');
         printWindow.document.write("{isi_invoice_js}");
-        printWindow.document.write('<script>window.onload = function() {{ window.print(); window.close(); }}<\\/script>');
+        printWindow.document.write('<script>window.onload = function() {{ document.title = "{safe_filename}"; window.print(); window.close(); }}<\\/script>');
         printWindow.document.write('</body></html>');
         printWindow.document.close();
     }}
