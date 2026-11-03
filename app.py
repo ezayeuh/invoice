@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import streamlit.components.v1 as components  # Tambahan library untuk tombol Print
 
 st.set_page_config(page_title="Auto Invoice Club Renang", layout="wide")
 
@@ -31,6 +32,8 @@ st.markdown("""
     .no-border td { border: none; padding: 4px 8px; }
     .signature-box { margin-top: 40px; display: flex; justify-content: space-between; text-align: center; }
     .footer-note { margin-top: 30px; font-size: 12px; text-align: center; font-style: italic; }
+    
+    /* Murni menyembunyikan semua elemen kecuali invoice saat diprint */
     @media print {
         body * { visibility: hidden; }
         .invoice-box, .invoice-box * { visibility: visible; }
@@ -50,10 +53,7 @@ with col_input:
     uploaded_file = st.file_uploader("Upload File Rekap Excel (.xlsx / .xls)", type=["xlsx", "xls"])
     
     st.header("📝 2. Pengaturan Invoice")
-    
-    # PILIHAN STATUS PEMBAYARAN
     status_pembayaran = st.radio("Status Dokumen", ["LUNAS", "BELUM LUNAS"], horizontal=True)
-    
     tarif_per_orang = st.number_input("Tarif per Kehadiran (Rp)", value=20000, step=5000)
     
     default_club_name = "Nama Club..."
@@ -70,9 +70,7 @@ with col_input:
                 
             total_bayar = jml_peserta * tarif_per_orang
             st.success(f"✅ Data Terbaca! Total Peserta: **{jml_peserta} orang** | Total Tagihan: **{format_rupiah(total_bayar)}**")
-            
             default_club_name = uploaded_file.name.replace(".xlsx", "").replace(".xls", "").replace("REKAP KEHADIRAN", "").replace("LAPORAN KEHADIRAN", "").replace("OKTOBER 2026", "").strip().upper()
-            
         except Exception as e:
             st.error(f"Gagal membaca data Excel: {e}")
     else:
@@ -84,19 +82,15 @@ with col_input:
     nama_pj = st.text_input("Nama Penanggung Jawab", "Bpk/Ibu ...")
     no_kontak = st.text_input("Nomor Kontak", "-")
     periode = st.text_input("Periode Latihan", "Oktober 2026")
-    
     total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
-    
     metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"])
     petugas = st.text_input("Nama Penerima/Petugas", "Admin KCW")
 
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
-
 cb_tunai = "☑" if metode == "Tunai" else "☐"
 cb_transfer = "☑" if metode == "Transfer" else "☐"
 cb_qris = "☑" if metode == "QRIS" else "☐"
 
-# --- LOGIKA DINAMIS BERDASARKAN STATUS ---
 if status_pembayaran == "LUNAS":
     judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> | INVOICE PEMBAYARAN DITERIMA |"
     label_status = "<strong>LUNAS ✓</strong>"
@@ -112,10 +106,37 @@ else:
 
 with col_preview:
     st.header("📄 3. Preview & Cetak")
-    if uploaded_file is None:
-        st.warning("Menunggu data diupload...")
     
-    st.caption("💡 Tekan **Ctrl + P** (Windows) atau **Cmd + P** (Mac) untuk mencetak atau simpan ke PDF. Area input di kiri tidak akan ikut tercetak.")
+    # --- TOMBOL POP-UP PRINT ---
+    # Memanggil window.parent.print() karena komponen HTML Streamlit berada di dalam iFrame
+    components.html(
+        """
+        <button onclick="window.parent.print()" style="
+            background-color: #008CBA; 
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0px 0px 20px 0px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+            font-family: Arial, sans-serif;
+        ">
+            🖨️ KLIK UNTUK CETAK INVOICE (PRINT)
+        </button>
+        """,
+        height=70
+    )
+    
+    if uploaded_file is None:
+        st.warning("Silakan cek dan pastikan data di sebelah kiri sudah benar sebelum mencetak.")
     
     html_content = f"""<div class="invoice-box">
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
