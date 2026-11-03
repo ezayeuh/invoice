@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import streamlit.components.v1 as components  # Tambahan library untuk tombol Print
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Auto Invoice Club Renang", layout="wide")
 
@@ -21,23 +21,37 @@ def terbilang(n):
 def format_rupiah(angka):
     return f"Rp {angka:,.0f}".replace(",", ".")
 
-# --- CSS UNTUK PRINT A4 ---
+# --- CSS UNTUK PRINT A4 (DIOPTIMALKAN 1 HALAMAN) ---
 st.markdown("""
     <style>
-    .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 16px; line-height: 24px; font-family: Arial, sans-serif; color: #000; background-color: #fff; }
-    .header-title { text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 0px; }
-    .sub-title { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-    table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; margin-bottom: 20px; }
-    table td, table th { padding: 8px; vertical-align: top; border: 1px solid #ddd; }
-    .no-border td { border: none; padding: 4px 8px; }
-    .signature-box { margin-top: 40px; display: flex; justify-content: space-between; text-align: center; }
-    .footer-note { margin-top: 30px; font-size: 12px; text-align: center; font-style: italic; }
+    .invoice-box { 
+        max-width: 800px; margin: auto; padding: 25px; border: 1px solid #eee; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.15); font-size: 15px; line-height: 22px; 
+        font-family: Arial, sans-serif; color: #000; background-color: #fff; 
+    }
+    .header-title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 0px; }
+    .sub-title { text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+    table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; margin-bottom: 15px; }
+    table td, table th { padding: 6px 8px; vertical-align: top; border: 1px solid #ddd; }
+    .no-border td { border: none; padding: 3px 8px; }
+    .signature-box { margin-top: 30px; display: flex; justify-content: space-between; text-align: center; }
+    .footer-note { margin-top: 20px; font-size: 11px; text-align: center; font-style: italic; }
     
-    /* Murni menyembunyikan semua elemen kecuali invoice saat diprint */
     @media print {
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
         body * { visibility: hidden; }
         .invoice-box, .invoice-box * { visibility: visible; }
-        .invoice-box { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; padding: 0; }
+        .invoice-box { 
+            position: absolute; left: 0; top: 0; width: 100%; 
+            border: none; box-shadow: none; padding: 0; margin: 0;
+            font-size: 14px; /* Ukuran font diperkecil sedikit agar muat 1 halaman */
+            line-height: 20px;
+        }
+        .header-title { font-size: 20px; }
+        .signature-box { margin-top: 20px; }
         .stApp { background-color: white; }
     }
     </style>
@@ -49,10 +63,10 @@ jml_peserta = 0
 total_bayar = 0
 
 with col_input:
-    st.header("📂 1. Upload Data Kehadiran")
-    uploaded_file = st.file_uploader("Upload File Rekap Excel (.xlsx / .xls)", type=["xlsx", "xls"])
+    st.header("📂 1. Upload Data")
+    uploaded_file = st.file_uploader("Upload Excel (.xlsx/.xls)", type=["xlsx", "xls"])
     
-    st.header("📝 2. Pengaturan Invoice")
+    st.header("📝 2. Pengaturan")
     status_pembayaran = st.radio("Status Dokumen", ["LUNAS", "BELUM LUNAS"], horizontal=True)
     tarif_per_orang = st.number_input("Tarif per Kehadiran (Rp)", value=20000, step=5000)
     
@@ -69,12 +83,10 @@ with col_input:
                 jml_peserta = max(0, len(df) - 1)
                 
             total_bayar = jml_peserta * tarif_per_orang
-            st.success(f"✅ Data Terbaca! Total Peserta: **{jml_peserta} orang** | Total Tagihan: **{format_rupiah(total_bayar)}**")
+            st.success(f"✅ Data Terbaca! Peserta: **{jml_peserta}** | Tagihan: **{format_rupiah(total_bayar)}**")
             default_club_name = uploaded_file.name.replace(".xlsx", "").replace(".xls", "").replace("REKAP KEHADIRAN", "").replace("LAPORAN KEHADIRAN", "").replace("OKTOBER 2026", "").strip().upper()
         except Exception as e:
-            st.error(f"Gagal membaca data Excel: {e}")
-    else:
-        st.info("Silakan upload file Excel untuk menghitung otomatis.")
+            st.error(f"Gagal membaca Excel: {e}")
 
     no_invoice = st.text_input("No. Invoice", f"INV/KCW/{datetime.today().year}/{datetime.today().month:02d}-XXX")
     tgl_bayar = st.date_input("Tanggal Dokumen", datetime.today())
@@ -83,8 +95,8 @@ with col_input:
     no_kontak = st.text_input("Nomor Kontak", "-")
     periode = st.text_input("Periode Latihan", "Oktober 2026")
     total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
-    metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"])
-    petugas = st.text_input("Nama Penerima/Petugas", "Admin KCW")
+    metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"], horizontal=True)
+    petugas = st.text_input("Penerima/Petugas", "Admin KCW")
 
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
 cb_tunai = "☑" if metode == "Tunai" else "☐"
@@ -107,47 +119,30 @@ else:
 with col_preview:
     st.header("📄 3. Preview & Cetak")
     
-    # --- TOMBOL POP-UP PRINT ---
-    # Memanggil window.parent.print() karena komponen HTML Streamlit berada di dalam iFrame
     components.html(
         """
         <button onclick="window.parent.print()" style="
-            background-color: #008CBA; 
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 0px 0px 20px 0px;
-            cursor: pointer;
-            border-radius: 8px;
-            width: 100%;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-            transition: 0.3s;
-            font-family: Arial, sans-serif;
+            background-color: #008CBA; border: none; color: white; padding: 12px 24px;
+            text-align: center; text-decoration: none; display: block; font-size: 16px;
+            font-weight: bold; margin: 0px 0px 15px 0px; cursor: pointer; border-radius: 6px;
+            width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: Arial, sans-serif;
         ">
-            🖨️ KLIK UNTUK CETAK INVOICE (PRINT)
+            🖨️ CETAK INVOICE SEKARANG (PRINT)
         </button>
         """,
-        height=70
+        height=60
     )
-    
-    if uploaded_file is None:
-        st.warning("Silakan cek dan pastikan data di sebelah kiri sudah benar sebelum mencetak.")
     
     html_content = f"""<div class="invoice-box">
 <div class="header-title">KAUMPANDAK CITY WATERPARK</div>
 <div class="sub-title">{judul_dokumen}</div>
-<table class="no-border" style="margin-bottom: 20px;">
+<table class="no-border" style="margin-bottom: 15px;">
 <tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr>
 <tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr>
 <tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d / %m / %Y")}</td></tr>
 </table>
 <strong>DITERIMA DARI:</strong>
-<table class="no-border" style="margin-bottom: 20px;">
+<table class="no-border" style="margin-bottom: 15px;">
 <tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td>{nama_club}</td></tr>
 <tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr>
 <tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr>
@@ -158,12 +153,12 @@ with col_preview:
 <tr><td style="text-align: center;">1</td><td>Pembayaran bulanan club renang</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr>
 </table>
 <table class="no-border">
-<tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp;&nbsp; {cb_qris} QRIS</td></tr>
+<tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp; {cb_qris} QRIS</td></tr>
 <tr><td>Keterangan / Referensi</td><td>:</td><td>-</td></tr>
 <tr><td><strong>TOTAL TAGIHAN</strong></td><td>:</td><td><strong>{format_rupiah(total_bayar)}</strong></td></tr>
 <tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr>
 </table>
-<p style="margin-top:20px;">{teks_penutup}</p>
+<p style="margin-top:15px;">{teks_penutup}</p>
 <div class="signature-box">
 <div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div>
 <div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div>
