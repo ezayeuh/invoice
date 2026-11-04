@@ -123,9 +123,11 @@ with col_input:
     petugas = st.text_input("Penerima/Petugas", "Admin KCW")
 
 teks_terbilang = (terbilang(total_bayar) + " Rupiah").strip().title()
-cb_tunai = "☑" if metode == "Tunai" else "☐"
-cb_transfer = "☑" if metode == "Transfer" else "☐"
-cb_qris = "☑" if metode == "QRIS" else "☐"
+
+# Menggunakan HTML Entity aman agar tidak rusak (Encoding-proof)
+cb_tunai = "&#9745;" if metode == "Tunai" else "&#9744;"
+cb_transfer = "&#9745;" if metode == "Transfer" else "&#9744;"
+cb_qris = "&#9745;" if metode == "QRIS" else "&#9744;"
 
 qris_direct_url = "https://lh3.googleusercontent.com/d/1JOS14LsBavoY1RujGfkQ15Z30AMTHRR4"
 
@@ -136,7 +138,7 @@ safe_filename = f"{clean_club}_{clean_inv}.pdf"
 
 if status_pembayaran == "LUNAS":
     judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> INVOICE PEMBAYARAN DITERIMA"
-    label_status = '<span style="background-color: #28a745 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">LUNAS</span>'
+    label_status = '<span style="background-color: #28a745 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">LUNAS &check;</span>'
     label_tanggal = "TANGGAL PEMBAYARAN"
     label_penerima = "DITERIMA DARI:"
     teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
@@ -147,7 +149,7 @@ if status_pembayaran == "LUNAS":
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px; font-weight: bold; color: #005f8c !important;">{teks_penutup}</p>"""
 else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> INVOICE MENUNGGU PEMBAYARAN"
-    label_status = '<span style="background-color: #dc3545 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">BELUM LUNAS</span>'
+    label_status = '<span style="background-color: #dc3545 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">BELUM LUNAS &#9203;</span>'
     label_tanggal = "TANGGAL INVOICE"
     label_penerima = "DITAGIHKAN KEPADA:"
     teks_penutup = "Terima kasih atas perhatian dan kerjasamanya."
@@ -161,13 +163,13 @@ else:
         <table style="width: 100%; border: none; margin-bottom: 0px;">
         <tr style="background-color: transparent;">
             <td class="bank-info" style="border: none; width: 55%; vertical-align: middle; padding: 0px;">
-                <span style="font-weight: bold; color: #005f8c !important;">TRANSFER BANK:</span><br>
-                • Bank BCA<br>
-                • No. Rek: <b>1234567890</b><br>
-                • a.n. Kaumpandak City Waterpark
+                <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
+                &bull; Bank BCA<br>
+                &bull; No. Rek: <b>1234567890</b><br>
+                &bull; a.n. Kaumpandak City Waterpark
             </td>
             <td class="qris-info" style="border: none; width: 45%; vertical-align: middle; padding: 0px;">
-                <span style="font-weight: bold; color: #005f8c !important;">PEMBAYARAN QRIS:</span><br>
+                <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
                 <img src="{qris_direct_url}" width="60" style="margin-top: 4px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
                 <span style="font-size: 9px; color: #666;">Scan untuk Membayar</span>
             </td>
@@ -187,6 +189,7 @@ with col_preview:
     <!DOCTYPE html>
     <html>
     <head>
+    <meta charset="utf-8">
     <style>
     body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; }}
     .btn-print {{
@@ -199,11 +202,11 @@ with col_preview:
     </style>
     </head>
     <body>
-    <button class="btn-print" onclick="printInvoice()">CETAK INVOICE SEKARANG (PRINT)</button>
+    <button class="btn-print" onclick="printInvoice()">🖨️ CETAK INVOICE SEKARANG (PRINT)</button>
     <script>
     function printInvoice() {{
         var printWindow = window.open('', '_blank');
-        printWindow.document.write('<html><head><title>{safe_filename}</title>');
+        printWindow.document.write('<html><head><meta charset="utf-8"><title>{safe_filename}</title>');
         printWindow.document.write('<style>');
         printWindow.document.write('* {{ box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }}');
         printWindow.document.write('@page {{ size: A4 portrait; margin: 10mm; }} ');
@@ -231,7 +234,6 @@ with col_preview:
     </html>
     """
 
-    # Menggunakan metode murni Base64 iframe untuk membypass deprecated st.components.v1
     b64_iframe = base64.b64encode(js_print_code.encode('utf-8')).decode('utf-8')
     st.markdown(f'<iframe src="data:text/html;base64,{b64_iframe}" width="100%" height="70" style="border:none; overflow:hidden;" scrolling="no"></iframe>', unsafe_allow_html=True)
     
