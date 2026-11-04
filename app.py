@@ -151,22 +151,24 @@ else:
 
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong style="color: #dc3545 !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
 
-    # --- PERBAIKAN TOTAL: Menggunakan inline style block tanpa tabel bersarang agar dijamin sejajar rapi ---
+    # --- FIX TOTAL: Menggunakan tabel fix murni dengan vertical-align: middle agar 100% sejajar rata tengah ---
     info_pembayaran_html = f"""
     <p style="margin-top:6px; margin-bottom: 4px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
-    <div style="width: 100%; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-        <div style="width: 55%; font-size: 12px; line-height: 18px; border-right: 1px solid #cce4ec; padding-right: 10px;">
-            <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
-            &bull; Bank BCA<br>
-            &bull; No. Rek: <b>1234567890</b><br>
-            &bull; a.n. Kaumpandak City Waterpark
-        </div>
-        <div style="width: 45%; text-align: center; font-size: 12px; padding-left: 10px;">
-            <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
-            <img src="{qris_direct_url}" width="50" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
-            <span style="font-size: 8.5px; color: #666;">Scan untuk Membayar</span>
-        </div>
-    </div>
+    <table style="width: 100%; border-collapse: collapse; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; margin-bottom: 10px;">
+        <tr>
+            <td style="width: 55%; padding: 12px 14px; vertical-align: middle !important; border: none; border-right: 1px solid #cce4ec; font-size: 12px; line-height: 18px;">
+                <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
+                &bull; Bank BCA<br>
+                &bull; No. Rek: <b>1234567890</b><br>
+                &bull; a.n. Kaumpandak City Waterpark
+            </td>
+            <td style="width: 45%; padding: 12px 14px; vertical-align: middle !important; border: none; text-align: center; font-size: 12px;">
+                <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
+                <img src="{qris_direct_url}" width="50" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
+                <span style="font-size: 8.5px; color: #666;">Scan untuk Membayar</span>
+            </td>
+        </tr>
+    </table>
     """
     penutup_html = f"""<p style="margin-top:8px; margin-bottom: 8px;">{teks_penutup}</p>"""
 
