@@ -147,7 +147,7 @@ if status_pembayaran == "LUNAS":
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px; font-weight: bold; color: #005f8c !important;">{teks_penutup}</p>"""
 else:
     judul_dokumen = "TAGIHAN PEMBAYARAN BULANAN CLUB RENANG <br> INVOICE MENUNGGU PEMBAYARAN"
-    label_status = '<span style="background-color: #dc3545 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">BELUM LUNAS ⏳</span>'
+    label_status = '<span style="background-color: #dc3545 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">BELUM LUNAS</span>'
     label_tanggal = "TANGGAL INVOICE"
     label_penerima = "DITAGIHKAN KEPADA:"
     teks_penutup = "Terima kasih atas perhatian dan kerjasamanya."
