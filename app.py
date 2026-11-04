@@ -136,7 +136,7 @@ safe_filename = f"{clean_club}_{clean_inv}.pdf"
 
 if status_pembayaran == "LUNAS":
     judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> INVOICE PEMBAYARAN DITERIMA"
-    label_status = '<span style="background-color: #28a745 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">LUNAS ✓</span>'
+    label_status = '<span style="background-color: #28a745 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">LUNAS</span>'
     label_tanggal = "TANGGAL PEMBAYARAN"
     label_penerima = "DITERIMA DARI:"
     teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
