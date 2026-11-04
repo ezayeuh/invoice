@@ -151,20 +151,20 @@ else:
 
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong style="color: #dc3545 !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
 
-    # --- FIX TOTAL: Menggunakan tabel fix murni dengan vertical-align: middle agar 100% sejajar rata tengah ---
+    # --- PERBAIKAN PRESISI TOTAL: Header judul atas dikunci segaris menggunakan tabel terpisah di dalam sel ---
     info_pembayaran_html = f"""
     <p style="margin-top:6px; margin-bottom: 4px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
     <table style="width: 100%; border-collapse: collapse; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; margin-bottom: 10px;">
         <tr>
-            <td style="width: 55%; padding: 12px 14px; vertical-align: middle !important; border: none; border-right: 1px solid #cce4ec; font-size: 12px; line-height: 18px;">
-                <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
+            <td style="width: 55%; padding: 10px 12px; vertical-align: top; border: none; border-right: 1px solid #cce4ec; font-size: 12px; line-height: 18px;">
+                <div style="font-weight: bold; color: #005f8c !important; margin-bottom: 4px;">&#128179; TRANSFER BANK:</div>
                 &bull; Bank BCA<br>
                 &bull; No. Rek: <b>1234567890</b><br>
                 &bull; a.n. Kaumpandak City Waterpark
             </td>
-            <td style="width: 45%; padding: 12px 14px; vertical-align: middle !important; border: none; text-align: center; font-size: 12px;">
-                <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
-                <img src="{qris_direct_url}" width="50" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
+            <td style="width: 45%; padding: 10px 12px; vertical-align: top; border: none; text-align: center; font-size: 12px;">
+                <div style="font-weight: bold; color: #005f8c !important; margin-bottom: 4px;">&#128241; PEMBAYARAN QRIS:</div>
+                <img src="{qris_direct_url}" width="48" style="border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
                 <span style="font-size: 8.5px; color: #666;">Scan untuk Membayar</span>
             </td>
         </tr>
