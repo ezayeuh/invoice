@@ -71,7 +71,6 @@ with col_input:
 
     st.header("📝 2. Pengaturan")
     status_pembayaran = st.radio("Status Dokumen", ["LUNAS", "BELUM LUNAS"], horizontal=True)
-    tarif_per_orang = st.number_input("Tarif per Kehadiran (Rp)", value=20000, step=5000)
 
     default_club_name = "Nama Club..."
     if uploaded_file is not None:
@@ -79,22 +78,35 @@ with col_input:
             df_raw = pd.read_excel(uploaded_file, header=None)
             header_row_idx = -1
             for i in range(min(20, len(df_raw))):
-                if df_raw.iloc[i].astype(str).str.upper().str.contains('NAMA').any():
+                row_str = df_raw.iloc[i].astype(str).str.upper().values
+                if any('NAMA' in str(val) for val in row_str) and any('HARGA' in str(val) for val in row_str):
                     header_row_idx = i
                     break
 
             if header_row_idx != -1:
                 df_raw.columns = df_raw.iloc[header_row_idx]
                 df = df_raw.iloc[header_row_idx + 1:].reset_index(drop=True)
-                col_nama = [col for col in df_raw.columns if 'NAMA' in str(col).upper()]
-                valid_rows = df[df[col_nama[0]].notna()]
-                valid_rows = valid_rows[~valid_rows[col_nama[0]].astype(str).str.contains("JUMLAH|NAMA", case=False)]
-                jml_peserta = len(valid_rows)
+                
+                # Cari kolom Nama Siswa dan Harga
+                col_nama = [col for col in df.columns if 'NAMA' in str(col).upper()]
+                col_harga = [col for col in df.columns if 'HARGA' in str(col).upper()]
+                
+                if col_nama and col_harga:
+                    valid_rows = df[df[col_nama[0]].notna()].copy()
+                    valid_rows = valid_rows[~valid_rows[col_nama[0]].astype(str).str.contains("JUMLAH|NAMA", case=False)]
+                    jml_peserta = len(valid_rows)
+                    
+                    # Konversi kolom harga ke numerik dan jumlahkan
+                    valid_rows[col_harga[0]] = pd.to_numeric(valid_rows[col_harga[0]].astype(str).str.replace(r'[^0-9]', '', regex=True), errors='fillna').fillna(0)
+                    total_bayar = valid_rows[col_harga[0]].sum()
+                else:
+                    jml_peserta = max(0, len(df_raw) - 1)
+                    total_bayar = 0
             else:
                 jml_peserta = max(0, len(df_raw) - 1)
+                total_bayar = 0
 
-            total_bayar = jml_peserta * tarif_per_orang
-            st.success(f"✅ Data Terbaca! Peserta: **{jml_peserta}** | Tagihan: **{format_rupiah(total_bayar)}**")
+            st.success(f"✅ Data Terbaca! Peserta/Baris: **{jml_peserta}** | Total Harga: **{format_rupiah(total_bayar)}**")
             default_club_name = uploaded_file.name.replace(".xlsx", "").replace(".xls", "").replace("REKAP KEHADIRAN", "").replace("LAPORAN KEHADIRAN", "").replace("OKTOBER 2026", "").strip().upper()
         except Exception as e:
             st.error(f"Gagal membaca Excel: {e}")
@@ -107,7 +119,9 @@ with col_input:
 
     keterangan_tabel = st.text_input("Keterangan di Tabel", "Pembayaran bulanan club renang")
     periode = st.text_input("Periode Latihan", "Oktober 2026")
-    total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=total_bayar)
+    
+    # Nilai total diambil dari total harga di excel, tapi tetap bisa diedit manual jika diperlukan
+    total_bayar = st.number_input("Total Pembayaran Akhir (Rp)", value=float(total_bayar))
 
     if status_pembayaran == "LUNAS":
         metode = st.radio("Metode Pembayaran", ["Tunai", "Transfer", "QRIS"], horizontal=True)
@@ -151,7 +165,7 @@ else:
 
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong style="color: #dc3545 !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
 
-    # --- PERBAIKAN PRESISI TOTAL: Header judul atas dikunci segaris menggunakan tabel terpisah di dalam sel ---
+    # --- TATA LETAK PRESISI: Header atas dijamin 100% rata sejajar segaris menggunakan tabel murni ---
     info_pembayaran_html = f"""
     <p style="margin-top:6px; margin-bottom: 4px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
     <table style="width: 100%; border-collapse: collapse; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; margin-bottom: 10px;">
