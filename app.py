@@ -121,7 +121,7 @@ cb_qris = "☑" if metode == "QRIS" else "☐"
 
 qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
 
-# Nama File PDF Dinamis
+# Nama File PDF Dinamis (Klub_Renang_INV_XXX.pdf)
 clean_club = "".join(c for c in nama_club if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
 clean_inv = "".join(c for c in no_invoice if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
 safe_filename = f"{clean_club}_{clean_inv}.pdf"
@@ -169,6 +169,7 @@ else:
     """
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px;">{teks_penutup}</p>"""
 
+# Menggunakan HTML statis tanpa f-string berlapis agar 100% anti error tag mentah
 isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d %b %Y")}</td></tr></table><span class="label-header">{label_penerima}</span><table class="no-border" style="margin-bottom: 12px; border-left: 3px solid #008CBA; background-color: #fcfcfc;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td><strong>{nama_club}</strong></td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><span class="label-header">RINCIAN PEMBAYARAN:</span><table><tr><th width="5%" style="text-align: center;">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
 
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
@@ -207,9 +208,8 @@ with col_preview:
         printWindow.document.write('.bank-info {{ border-right: 1px solid #cce4ec; padding-right: 10px; }}');
         printWindow.document.write('.qris-info {{ text-align: center; padding-left: 10px; }}');
         printWindow.document.write('.label-header {{ color: #005f8c; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-bottom: 4px; display: inline-block; }}');
-        printWindow.document.write('</style></head><body>');
+        printWindow.document.write('</style></head><body onload="document.title=&quot;{safe_filename}&quot;; window.print(); window.close();">');
         printWindow.document.write("{isi_invoice_js}");
-        printWindow.document.write('<script>window.onload = function() {{ document.title = "{safe_filename}"; window.print(); window.close(); }}<\\/script>');
         printWindow.document.write('</body></html>');
         printWindow.document.close();
     }}
