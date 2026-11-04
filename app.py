@@ -161,13 +161,13 @@ else:
         <table style="width: 100%; border: none; margin-bottom: 0px;">
         <tr style="background-color: transparent;">
             <td class="bank-info" style="border: none; width: 55%; vertical-align: middle; padding: 0px;">
-                <span style="font-weight: bold; color: #005f8c !important;">💳 TRANSFER BANK:</span><br>
+                <span style="font-weight: bold; color: #005f8c !important;">TRANSFER BANK:</span><br>
                 • Bank BCA<br>
                 • No. Rek: <b>1234567890</b><br>
                 • a.n. Kaumpandak City Waterpark
             </td>
             <td class="qris-info" style="border: none; width: 45%; vertical-align: middle; padding: 0px;">
-                <span style="font-weight: bold; color: #005f8c !important;">📱 PEMBAYARAN QRIS:</span><br>
+                <span style="font-weight: bold; color: #005f8c !important;">PEMBAYARAN QRIS:</span><br>
                 <img src="{qris_direct_url}" width="60" style="margin-top: 4px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
                 <span style="font-size: 9px; color: #666;">Scan untuk Membayar</span>
             </td>
@@ -199,7 +199,7 @@ with col_preview:
     </style>
     </head>
     <body>
-    <button class="btn-print" onclick="printInvoice()">🖨️ CETAK INVOICE SEKARANG (PRINT)</button>
+    <button class="btn-print" onclick="printInvoice()">CETAK INVOICE SEKARANG (PRINT)</button>
     <script>
     function printInvoice() {{
         var printWindow = window.open('', '_blank');
