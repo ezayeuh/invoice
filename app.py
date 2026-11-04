@@ -127,7 +127,7 @@ cb_tunai = "☑" if metode == "Tunai" else "☐"
 cb_transfer = "☑" if metode == "Transfer" else "☐"
 cb_qris = "☑" if metode == "QRIS" else "☐"
 
-qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
+qris_direct_url = "https://lh3.googleusercontent.com/d/1JOS14LsBavoY1RujGfkQ15Z30AMTHRR4"
 
 # Nama File PDF Dinamis
 clean_club = "".join(c for c in nama_club if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
