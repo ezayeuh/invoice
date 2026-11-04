@@ -50,9 +50,31 @@ st.markdown("""
     .signature-box { margin-top: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 13.5px; }
     .footer-note { margin-top: 15px; font-size: 10px; text-align: center; font-style: italic; color: #666; border-top: 1px dashed #ccc; padding-top: 8px; }
     
-    .payment-card { background-color: #f4f9fc; border: 1px solid #cce4ec; border-left: 5px solid #008CBA; border-radius: 6px; padding: 12px 14px; margin-top: 6px; font-size: 12px; line-height: 18px; }
-    .bank-info { border-right: 1px solid #cce4ec; padding-right: 12px; vertical-align: middle !important; }
-    .qris-info { text-align: center; padding-left: 12px; vertical-align: middle !important; }
+    /* Perbaikan Flexbox agar Transfer Bank & QRIS Presisi Sejajar Tengah */
+    .payment-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f4f9fc;
+        border: 1px solid #cce4ec;
+        border-left: 5px solid #008CBA;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-top: 6px;
+    }
+    .bank-box {
+        flex: 1;
+        padding-right: 15px;
+        border-right: 1px solid #cce4ec;
+        font-size: 12px;
+        line-height: 18px;
+    }
+    .qris-box {
+        flex: 1;
+        text-align: center;
+        padding-left: 15px;
+        font-size: 12px;
+    }
     .label-header { color: #005f8c; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-bottom: 4px; display: inline-block;}
     
     @media print {
@@ -142,7 +164,7 @@ if status_pembayaran == "LUNAS":
     teks_penutup = "Terima kasih telah memilih Kaumpandak City Waterpark sebagai tempat latihan club renang Anda."
     teks_footer = "Dokumen ini merupakan bukti pembayaran yang sah setelah pembayaran diterima oleh pihak pengelola."
 
-    metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp; {cb_qris} QRIS</td></tr><tr><td>Keterangan / Referensi</td><td>:</td><td>{referensi}</td></tr><tr><td><strong>TOTAL DIBAYAR</strong></td><td>:</td><td><strong style="color: #008CBA !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
+    metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>METODE PEMBAYARAN</strong></td><td width="5%">:</td><td>{cb_tunai} Tunai &nbsp;&nbsp; {cb_transfer} Transfer &nbsp;&nbsp; {cb_qris} QRIS</td></tr><tr><td>Keterangan / Ref. Pembayaran</td><td>:</td><td>{referensi}</td></tr><tr><td><strong>TOTAL DIBAYAR</strong></td><td>:</td><td><strong style="color: #008CBA !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
     info_pembayaran_html = ""
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px; font-weight: bold; color: #005f8c !important;">{teks_penutup}</p>"""
 else:
@@ -155,25 +177,21 @@ else:
 
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong style="color: #dc3545 !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
 
-    # Perataan vertikal disamakan menggunakan class bank-info dan qris-info
+    # Menggunakan struktur Flexbox agar kotak Bank dan QRIS rata tengah secara vertikal
     info_pembayaran_html = f"""
     <p style="margin-top:8px; margin-bottom: 4px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
-    <div class="payment-card">
-        <table style="width: 100%; border: none; margin-bottom: 0px;">
-        <tr style="background-color: transparent;">
-            <td class="bank-info" style="border: none; width: 52%;">
-                <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
-                &bull; Bank BCA<br>
-                &bull; No. Rek: <b>1234567890</b><br>
-                &bull; a.n. Kaumpandak City Waterpark
-            </td>
-            <td class="qris-info" style="border: none; width: 48%;">
-                <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
-                <img src="{qris_direct_url}" width="55" style="margin-top: 4px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
-                <span style="font-size: 9px; color: #666;">Scan untuk Membayar</span>
-            </td>
-        </tr>
-        </table>
+    <div class="payment-container">
+        <div class="bank-box">
+            <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
+            &bull; Bank BCA<br>
+            &bull; No. Rek: <b>1234567890</b><br>
+            &bull; a.n. Kaumpandak City Waterpark
+        </div>
+        <div class="qris-box">
+            <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
+            <img src="{qris_direct_url}" width="55" style="margin-top: 4px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
+            <span style="font-size: 9px; color: #666;">Scan untuk Membayar</span>
+        </div>
     </div>
     """
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px;">{teks_penutup}</p>"""
@@ -219,9 +237,9 @@ with col_preview:
         printWindow.document.write('.no-border td {{ border: none; padding: 3px 6px; }} ');
         printWindow.document.write('.signature-box {{ margin-top: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 13.5px; }} ');
         printWindow.document.write('.footer-note {{ margin-top: 15px; font-size: 10px; text-align: center; font-style: italic; color: #666; border-top: 1px dashed #ccc; padding-top: 8px; }}');
-        printWindow.document.write('.payment-card {{ background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; border-radius: 6px; padding: 12px 14px; margin-top: 6px; font-size: 12px; line-height: 18px; }}');
-        printWindow.document.write('.bank-info {{ border-right: 1px solid #cce4ec; padding-right: 12px; vertical-align: middle !important; }}');
-        printWindow.document.write('.qris-info {{ text-align: center; padding-left: 12px; vertical-align: middle !important; }}');
+        printWindow.document.write('.payment-container {{ display: flex; align-items: center; justify-content: space-between; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; border-radius: 6px; padding: 12px 16px; margin-top: 6px; }}');
+        printWindow.document.write('.bank-box {{ flex: 1; padding-right: 15px; border-right: 1px solid #cce4ec; font-size: 12px; line-height: 18px; }}');
+        printWindow.document.write('.qris-box {{ flex: 1; text-align: center; padding-left: 15px; font-size: 12px; }}');
         printWindow.document.write('.label-header {{ color: #005f8c; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-bottom: 4px; display: inline-block; }}');
         printWindow.document.write('</style></head><body onload="document.title=&quot;{safe_filename}&quot;; window.print(); window.close();">');
         printWindow.document.write("{isi_invoice_js}");
