@@ -23,6 +23,7 @@ def format_rupiah(angka):
 # --- CSS PREVIEW BERWARNA & ELEGAN ---
 st.markdown("""
     <style>
+    .preview-box * { box-sizing: border-box; }
     .preview-box { 
         width: 100%; 
         max-width: 680px; 
@@ -38,11 +39,11 @@ st.markdown("""
         font-family: 'Segoe UI', Arial, sans-serif; 
         color: #333; 
         background-color: #fff; 
-        box-sizing: border-box;
+        overflow-x: hidden;
     }
     .header-title { text-align: center; font-weight: 900; font-size: 24px; color: #005f8c; margin-bottom: 4px; letter-spacing: 0.5px; }
     .sub-title { text-align: center; font-weight: bold; font-size: 13.5px; background-color: #008CBA; color: #fff; margin-bottom: 15px; padding: 6px; border-radius: 4px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; table-layout: fixed; word-wrap: break-word; }
     table td, table th { padding: 7px 8px; vertical-align: top; border: 1px solid #ddd; }
     table th { background-color: #008CBA; color: #ffffff; border: 1px solid #007a99; }
     .no-border td { border: none; padding: 3px 6px; }
@@ -121,7 +122,7 @@ cb_qris = "☑" if metode == "QRIS" else "☐"
 
 qris_direct_url = "https://lh3.googleusercontent.com/d/1ieFAk4P8UMt_I0Ue30ztC7JPX9RTi1Rz"
 
-# Nama File PDF Dinamis (Klub_Renang_INV_XXX.pdf)
+# Nama File PDF Dinamis
 clean_club = "".join(c for c in nama_club if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
 clean_inv = "".join(c for c in no_invoice if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
 safe_filename = f"{clean_club}_{clean_inv}.pdf"
@@ -169,8 +170,7 @@ else:
     """
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px;">{teks_penutup}</p>"""
 
-# Menggunakan HTML statis tanpa f-string berlapis agar 100% anti error tag mentah
-isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d %b %Y")}</td></tr></table><span class="label-header">{label_penerima}</span><table class="no-border" style="margin-bottom: 12px; border-left: 3px solid #008CBA; background-color: #fcfcfc;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td><strong>{nama_club}</strong></td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><span class="label-header">RINCIAN PEMBAYARAN:</span><table><tr><th width="5%" style="text-align: center;">NO.</th><th width="45%">KETERANGAN</th><th width="15%" style="text-align: center;">PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="20%" style="text-align: right;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
+isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d %b %Y")}</td></tr></table><span class="label-header">{label_penerima}</span><table class="no-border" style="margin-bottom: 12px; border-left: 3px solid #008CBA; background-color: #fcfcfc;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td><strong>{nama_club}</strong></td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><span class="label-header">RINCIAN PEMBAYARAN:</span><table><tr><th width="5%" style="text-align: center;">NO.</th><th width="40%">KETERANGAN</th><th width="15%" style="text-align: center;">PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="25%" style="text-align: right; padding-right: 15px;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right; padding-right: 15px;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
 
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
 
@@ -193,12 +193,13 @@ with col_preview:
         var printWindow = window.open('', '_blank');
         printWindow.document.write('<html><head><title>{safe_filename}</title>');
         printWindow.document.write('<style>');
+        printWindow.document.write('* {{ box-sizing: border-box; }}');
         printWindow.document.write('@page {{ size: A4 portrait; margin: 10mm; }} ');
         printWindow.document.write('body {{ font-family: "Segoe UI", Arial, sans-serif; color: #333; padding: 0; margin: 0; font-size: 13.5px; line-height: 20px; }} ');
         printWindow.document.write('.preview-box {{ width: 100% !important; max-width: 100% !important; border: none !important; border-top: 10px solid #008CBA !important; box-shadow: none !important; padding: 10px !important; margin: 0 !important; border-radius: 0 !important; }} ');
         printWindow.document.write('.header-title {{ text-align: center; font-weight: 900; font-size: 24px; color: #005f8c; margin-bottom: 4px; letter-spacing: 0.5px; }} ');
         printWindow.document.write('.sub-title {{ text-align: center; font-weight: bold; font-size: 13.5px; background-color: #008CBA; color: #fff; margin-bottom: 15px; padding: 6px; border-radius: 4px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }} ');
-        printWindow.document.write('table {{ width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; }} ');
+        printWindow.document.write('table {{ width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; table-layout: fixed; word-wrap: break-word; }} ');
         printWindow.document.write('table td, table th {{ padding: 7px 8px; vertical-align: top; border: 1px solid #ddd; }} ');
         printWindow.document.write('table th {{ background-color: #008CBA !important; color: #ffffff !important; border: 1px solid #007a99; -webkit-print-color-adjust: exact; print-color-adjust: exact; }} ');
         printWindow.document.write('.no-border td {{ border: none; padding: 3px 6px; }} ');
