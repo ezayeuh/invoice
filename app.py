@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import streamlit.components.v1 as components
+import base64
 
 st.set_page_config(page_title="Auto Invoice Club Renang", layout="wide")
 
@@ -134,7 +134,6 @@ clean_club = "".join(c for c in nama_club if c.isalnum() or c in (' ', '_', '-')
 clean_inv = "".join(c for c in no_invoice if c.isalnum() or c in (' ', '_', '-')).strip().replace(" ", "_")
 safe_filename = f"{clean_club}_{clean_inv}.pdf"
 
-# Penambahan paksaan cetak warna pada inline style badge status
 if status_pembayaran == "LUNAS":
     judul_dokumen = "BUKTI PEMBAYARAN BULANAN CLUB RENANG <br> INVOICE PEMBAYARAN DITERIMA"
     label_status = '<span style="background-color: #28a745 !important; color: white !important; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">LUNAS ✓</span>'
@@ -179,23 +178,28 @@ else:
     penutup_html = f"""<p style="margin-top:10px; margin-bottom: 10px;">{teks_penutup}</p>"""
 
 isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d %b %Y")}</td></tr></table><span class="label-header">{label_penerima}</span><table class="no-border" style="margin-bottom: 12px; border-left: 3px solid #008CBA; background-color: #fcfcfc !important;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td><strong>{nama_club}</strong></td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><span class="label-header">RINCIAN PEMBAYARAN:</span><table><tr><th width="8%" style="text-align: center; white-space: nowrap;">NO.</th><th width="37%">KETERANGAN</th><th width="15%" style="text-align: center;">PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="25%" style="text-align: right; padding-right: 15px;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right; padding-right: 15px;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
-
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
 
 with col_preview:
     st.header("📄 3. Preview & Cetak")
 
     js_print_code = f"""
-    <button onclick="printInvoice()" style="
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; }}
+    .btn-print {{
         background-color: #008CBA; border: none; color: white; padding: 12px 24px;
         text-align: center; text-decoration: none; display: block; font-size: 16px;
-        font-weight: bold; margin: 0px 0px 15px 0px; cursor: pointer; border-radius: 6px;
-        width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: Arial, sans-serif;
-        transition: 0.3s;
-    ">
-        🖨️ CETAK INVOICE SEKARANG (PRINT)
-    </button>
-    
+        font-weight: bold; margin: 0; cursor: pointer; border-radius: 6px;
+        width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s;
+    }}
+    .btn-print:hover {{ background-color: #007399; }}
+    </style>
+    </head>
+    <body>
+    <button class="btn-print" onclick="printInvoice()">🖨️ CETAK INVOICE SEKARANG (PRINT)</button>
     <script>
     function printInvoice() {{
         var printWindow = window.open('', '_blank');
@@ -223,7 +227,12 @@ with col_preview:
         printWindow.document.close();
     }}
     </script>
+    </body>
+    </html>
     """
 
-    components.html(js_print_code, height=70)
+    # Menggunakan metode murni Base64 iframe untuk membypass deprecated st.components.v1
+    b64_iframe = base64.b64encode(js_print_code.encode('utf-8')).decode('utf-8')
+    st.markdown(f'<iframe src="data:text/html;base64,{b64_iframe}" width="100%" height="70" style="border:none; overflow:hidden;" scrolling="no"></iframe>', unsafe_allow_html=True)
+    
     st.markdown(f'<div class="preview-box">{isi_invoice}</div>', unsafe_allow_html=True)
