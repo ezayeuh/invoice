@@ -43,13 +43,12 @@ st.markdown("""
     }
     .header-title { text-align: center; font-weight: 900; font-size: 24px; color: #005f8c; margin-bottom: 4px; letter-spacing: 0.5px; }
     .sub-title { text-align: center; font-weight: bold; font-size: 13.5px; background-color: #008CBA; color: #fff; margin-bottom: 15px; padding: 6px; border-radius: 4px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; table-layout: fixed; word-wrap: break-word; }
-    table td, table th { padding: 7px 8px; vertical-align: top; border: 1px solid #ddd; }
-    table th { background-color: #008CBA; color: #ffffff; border: 1px solid #007a99; }
+    table.main-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; table-layout: fixed; word-wrap: break-word; }
+    table.main-table td, table.main-table th { padding: 7px 8px; vertical-align: top; border: 1px solid #ddd; }
+    table.main-table th { background-color: #008CBA; color: #ffffff; border: 1px solid #007a99; }
     .no-border td { border: none; padding: 3px 6px; }
     .signature-box { margin-top: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 13.5px; }
     .footer-note { margin-top: 15px; font-size: 10px; text-align: center; font-style: italic; color: #666; border-top: 1px dashed #ccc; padding-top: 8px; }
-    
     .label-header { color: #005f8c; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-bottom: 4px; display: inline-block;}
     
     @media print {
@@ -152,28 +151,26 @@ else:
 
     metode_pembayaran_html = f"""<table class="no-border" style="margin-bottom: 8px;"><tr><td width="30%"><strong>TOTAL TAGIHAN</strong></td><td width="5%">:</td><td><strong style="color: #dc3545 !important; font-size: 14.5px;">{format_rupiah(total_bayar)}</strong></td></tr><tr><td><strong>Terbilang</strong></td><td>:</td><td><em>{teks_terbilang}</em></td></tr></table>"""
 
-    # --- PERBAIKAN TOTAL: Menggunakan struktur tabel murni agar 100% sejajar rapi & stabil ---
+    # --- PERBAIKAN TOTAL: Menggunakan inline style block tanpa tabel bersarang agar dijamin sejajar rapi ---
     info_pembayaran_html = f"""
     <p style="margin-top:6px; margin-bottom: 4px; font-weight: bold;">Mohon segera melakukan pelunasan tagihan melalui informasi pembayaran di bawah ini:</p>
-    <table style="width: 100%; border-collapse: collapse; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; margin-bottom: 10px;">
-        <tr>
-            <td style="width: 55%; padding: 10px 12px; vertical-align: middle; border: none; border-right: 1px solid #cce4ec; font-size: 12px; line-height: 17px;">
-                <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
-                &bull; Bank BCA<br>
-                &bull; No. Rek: <b>1234567890</b><br>
-                &bull; a.n. Kaumpandak City Waterpark
-            </td>
-            <td style="width: 45%; padding: 10px 12px; vertical-align: middle; border: none; text-align: center; font-size: 12px;">
-                <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
-                <img src="{qris_direct_url}" width="50" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
-                <span style="font-size: 8.5px; color: #666;">Scan untuk Membayar</span>
-            </td>
-        </tr>
-    </table>
+    <div style="width: 100%; background-color: #f4f9fc !important; border: 1px solid #cce4ec; border-left: 5px solid #008CBA !important; border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="width: 55%; font-size: 12px; line-height: 18px; border-right: 1px solid #cce4ec; padding-right: 10px;">
+            <span style="font-weight: bold; color: #005f8c !important;">&#128179; TRANSFER BANK:</span><br>
+            &bull; Bank BCA<br>
+            &bull; No. Rek: <b>1234567890</b><br>
+            &bull; a.n. Kaumpandak City Waterpark
+        </div>
+        <div style="width: 45%; text-align: center; font-size: 12px; padding-left: 10px;">
+            <span style="font-weight: bold; color: #005f8c !important;">&#128241; PEMBAYARAN QRIS:</span><br>
+            <img src="{qris_direct_url}" width="50" style="margin-top: 3px; border: 1px solid #ccc; padding: 2px; background: #fff; border-radius: 4px;"><br>
+            <span style="font-size: 8.5px; color: #666;">Scan untuk Membayar</span>
+        </div>
+    </div>
     """
     penutup_html = f"""<p style="margin-top:8px; margin-bottom: 8px;">{teks_penutup}</p>"""
 
-isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d %b %Y")}</td></tr></table><span class="label-header">{label_penerima}</span><table class="no-border" style="margin-bottom: 12px; border-left: 3px solid #008CBA; background-color: #fcfcfc !important;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td><strong>{nama_club}</strong></td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><span class="label-header">RINCIAN PEMBAYARAN:</span><table><tr><th width="8%" style="text-align: center; white-space: nowrap;">NO.</th><th width="37%">KETERANGAN</th><th width="15%" style="text-align: center;">PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="25%" style="text-align: right; padding-right: 15px;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right; padding-right: 15px;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
+isi_invoice = f"""<div class="preview-box"><div class="header-title">KAUMPANDAK CITY WATERPARK</div><div class="sub-title">{judul_dokumen}</div><table class="no-border" style="margin-bottom: 12px;"><tr><td width="30%"><strong>NO. INVOICE</strong></td><td width="5%">:</td><td>{no_invoice}</td></tr><tr><td><strong>STATUS PEMBAYARAN</strong></td><td>:</td><td>{label_status}</td></tr><tr><td><strong>{label_tanggal}</strong></td><td>:</td><td>{tgl_bayar.strftime("%d %b %Y")}</td></tr></table><span class="label-header">{label_penerima}</span><table class="no-border" style="margin-bottom: 12px; border-left: 3px solid #008CBA; background-color: #fcfcfc !important;"><tr><td width="30%">Nama Club Renang</td><td width="5%">:</td><td><strong>{nama_club}</strong></td></tr><tr><td>Nama Penanggung Jawab</td><td>:</td><td>{nama_pj}</td></tr><tr><td>Nomor Kontak</td><td>:</td><td>{no_kontak}</td></tr></table><span class="label-header">RINCIAN PEMBAYARAN:</span><table class="main-table"><tr><th width="8%" style="text-align: center; white-space: nowrap;">NO.</th><th width="37%">KETERANGAN</th><th width="15%" style="text-align: center;">PESERTA</th><th width="15%" style="text-align: center;">PERIODE</th><th width="25%" style="text-align: right; padding-right: 15px;">TOTAL</th></tr><tr><td style="text-align: center;">1</td><td>{keterangan_tabel}</td><td style="text-align: center;">{jml_peserta} orang</td><td style="text-align: center;">{periode}</td><td style="text-align: right; padding-right: 15px;">{format_rupiah(total_bayar)}</td></tr></table>{metode_pembayaran_html}{info_pembayaran_html}{penutup_html}<div class="signature-box"><div><p>PENERIMA / PETUGAS</p><br><br><br><p>( <strong>{petugas}</strong> )</p></div><div><p>PENGELOLA KAUMPANDAK CITY WATERPARK</p><br><br><br><p>( ........................................ )</p></div></div><div class="footer-note">{teks_footer}</div></div>"""
 isi_invoice_js = isi_invoice.replace('\n', ' ').replace('\r', '').replace('"', '\\"')
 
 with col_preview:
@@ -208,9 +205,9 @@ with col_preview:
         printWindow.document.write('.preview-box {{ width: 100% !important; max-width: 100% !important; border: none !important; border-top: 10px solid #008CBA !important; box-shadow: none !important; padding: 10px !important; margin: 0 !important; border-radius: 0 !important; }} ');
         printWindow.document.write('.header-title {{ text-align: center; font-weight: 900; font-size: 24px; color: #005f8c; margin-bottom: 4px; letter-spacing: 0.5px; }} ');
         printWindow.document.write('.sub-title {{ text-align: center; font-weight: bold; font-size: 13.5px; background-color: #008CBA !important; color: #fff !important; margin-bottom: 15px; padding: 6px; border-radius: 4px; }} ');
-        printWindow.document.write('table {{ width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; table-layout: fixed; word-wrap: break-word; }} ');
-        printWindow.document.write('table td, table th {{ padding: 7px 8px; vertical-align: top; border: 1px solid #ddd; }} ');
-        printWindow.document.write('table th {{ background-color: #008CBA !important; color: #ffffff !important; border: 1px solid #007a99; }} ');
+        printWindow.document.write('table.main-table {{ width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13.5px; table-layout: fixed; word-wrap: break-word; }} ');
+        printWindow.document.write('table.main-table td, table.main-table th {{ padding: 7px 8px; vertical-align: top; border: 1px solid #ddd; }} ');
+        printWindow.document.write('table.main-table th {{ background-color: #008CBA !important; color: #ffffff !important; border: 1px solid #007a99; }} ');
         printWindow.document.write('.no-border td {{ border: none; padding: 3px 6px; }} ');
         printWindow.document.write('.signature-box {{ margin-top: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 13.5px; }} ');
         printWindow.document.write('.footer-note {{ margin-top: 15px; font-size: 10px; text-align: center; font-style: italic; color: #666; border-top: 1px dashed #ccc; padding-top: 8px; }}');
