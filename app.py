@@ -172,9 +172,9 @@ else:
         <tr>
             <td style="width: 55%; padding: 10px 12px; vertical-align: top; border: none; border-right: 1px solid #cce4ec; font-size: 12px; line-height: 18px;">
                 <div style="font-weight: bold; color: #005f8c !important; margin-bottom: 4px;">&#128179; TRANSFER BANK:</div>
-                &bull; Bank BCA<br>
-                &bull; No. Rek: <b>1234567890</b><br>
-                &bull; a.n. Kaumpandak City Waterpark
+                &bull; Bank BNI<br>
+                &bull; No. Rek: <b>1982336253</b><br>
+                &bull; a.n. DARA IWANA YUNANITA
             </td>
             <td style="width: 45%; padding: 10px 12px; vertical-align: top; border: none; text-align: center; font-size: 12px;">
                 <div style="font-weight: bold; color: #005f8c !important; margin-bottom: 4px;">&#128241; PEMBAYARAN QRIS:</div>
